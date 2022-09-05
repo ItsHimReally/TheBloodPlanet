@@ -3,8 +3,9 @@
 """
 
 # импорты основных библиотек
-import pygame, logging
 from abc import ABC
+import logging
+import pygame
 
 # настройка логов
 logging.basicConfig(filename="GameLogs.log", level=logging.INFO)
@@ -52,7 +53,7 @@ class Object(ABC):
 
         logging.info(f'Object [{self.name}] has been created!')
 
-    def draw(self):
+    def paint(self):
         if ~self.activeSelf:
             return
 
@@ -62,3 +63,20 @@ class GameObject(Object):
                  game_obj_transform=Transform()):
         self.transform = game_obj_transform
         super(GameObject, self).__init__(obj_name=game_obj_name, obj_parent=game_obj_parent, obj_tag=game_obj_tag)
+
+
+class SpriteObject(GameObject):
+    def __init__(self, sprite_obj_name='Game Object', sprite_obj_parent=None, sprite_obj_tag='Object',
+                 sprite_obj_transform=Transform(), image_path=""):
+        self.sprite = pygame.image.load(image_path) if image_path != "" else logging.info(f'Image path has not been defined!')
+        super(GameObject, self).__init__(game_obj_name=sprite_obj_name, game_obj_parent=sprite_obj_parent,
+                                         game_obj_tag=sprite_obj_tag, game_obj_transform=sprite_obj_transform)
+
+    def paint(self, screen):
+        super(SpriteObject, self).paint()
+        screen.blit(self.sprite, pygame.Rect(self.transform.position, self.transform.scale))
+
+
+class AudioPlayer(Object):
+    def __init__(self, audio_player_name='Game Object', audio_player_parent=None, audio_player_tag='Object'):
+        pass

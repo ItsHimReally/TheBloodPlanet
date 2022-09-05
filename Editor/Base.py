@@ -35,7 +35,7 @@ class Transform:
     
     '''
 
-    def Translate(self, shift_x=0, shift_y=0):
+    def translate(self, shift_x=0, shift_y=0):
         self.position = Vector2(self.position.x + shift_x, self.position.y + shift_y)
 
 
@@ -69,6 +69,7 @@ class SpriteObject(GameObject):
     def __init__(self, sprite_obj_name='Game Object', sprite_obj_parent=None, sprite_obj_tag='Object',
                  sprite_obj_transform=Transform(), image_path=""):
         self.sprite = pygame.image.load(image_path) if image_path != "" else logging.info(f'Image path has not been defined!')
+
         super(GameObject, self).__init__(game_obj_name=sprite_obj_name, game_obj_parent=sprite_obj_parent,
                                          game_obj_tag=sprite_obj_tag, game_obj_transform=sprite_obj_transform)
 
@@ -78,5 +79,31 @@ class SpriteObject(GameObject):
 
 
 class AudioPlayer(Object):
-    def __init__(self, audio_player_name='Game Object', audio_player_parent=None, audio_player_tag='Object'):
-        pass
+    def __init__(self, audio_player_name='Game Object', audio_player_parent=None, audio_player_tag='Audio',
+                 audio_path=''):
+        self.sound = pygame.mixer.Sound(audio_path) if audio_path != '' else logging.info(f'Audio path has not been defined!')
+        super(Object, self).__init__(obj_name=audio_player_name, obj_parent=audio_player_parent,
+                                     obj_tag=audio_player_tag)
+
+    def play(self):
+        self.sound.play()
+
+
+class Animation(SpriteObject):
+    def __init__(self, anim_obj_name='Game Object', anim_obj_parent=None, anim_obj_tag='Object',
+                 anim_obj_transform=Transform(), image_paths=None):
+        self.count = 0
+        self.frames = []
+        if image_paths:
+            for item in image_paths:
+                self.frames.append(pygame.image.load(item))
+        else:
+            logging.info(f'Frames path has not been defined!')
+
+        super(GameObject, self).__init__(sprite_obj_name=anim_obj_name, sprite_obj_parent=anim_obj_parent,
+                                         sprite_obj_tag=anim_obj_tag, sprite_obj_transform=anim_obj_transform)
+
+    def paint(self, screen):
+        self.sprite = self.frames[self.count]
+        self.count += 1
+        super(Animation, self).paint(screen)

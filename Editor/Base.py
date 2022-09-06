@@ -77,6 +77,22 @@ class SpriteObject(GameObject):
         super(SpriteObject, self).paint()
         screen.blit(self.sprite, pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x, self.transform.position.y))
 
+'''
+Класс UI элементов
+'''
+
+
+class Button(SpriteObject):
+    def __init__(self, button_on_clicked, ui_obj_name='Button Object', ui_obj_parent=None, ui_obj_tag='button',
+                 ui_obj_transform=Transform(), ui_image_path=""):
+        self.clicked = button_on_clicked
+        super(Button, self).__init__(sprite_obj_name=ui_obj_name, sprite_obj_parent=ui_obj_parent,
+                                       sprite_obj_tag=ui_obj_tag, sprite_obj_transform=ui_obj_transform,
+                                       image_path=ui_image_path)
+
+    def on_click(self):
+        self.clicked if self.clicked else logging.info(f'Clicked event has not been declared')
+
 
 class AudioPlayer(Object):
     def __init__(self, audio_player_name='Game Object', audio_player_parent=None, audio_player_tag='Audio',

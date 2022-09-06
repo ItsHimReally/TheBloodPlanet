@@ -10,9 +10,11 @@ pygame.display.set_caption('')
 game = True
 # объект игрока
 player = Base.SpriteObject('player', None, 'player', Base.Transform(), 'C:/Users\Danya/RedPlanet-Game/sprites/main.png')
+# объект заднего фона
+background = Base.SpriteObject('background', None, 'bg', Base.Transform(), 'C:/Users\Danya/RedPlanet-Game/sprites/background.png')
 
 while game:
-    screen.fill([0, 0, 0])
+    background.paint(screen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game = False

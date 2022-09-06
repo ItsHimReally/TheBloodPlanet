@@ -75,7 +75,7 @@ class SpriteObject(GameObject):
 
     def paint(self, screen):
         super(SpriteObject, self).paint()
-        screen.blit(self.sprite, pygame.Rect(self.transform.position, self.transform.scale))
+        screen.blit(self.sprite, pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x, self.transform.position.y))
 
 
 class AudioPlayer(Object):

@@ -20,6 +20,9 @@ background = Base.SpriteObject('background', None, 'bg', Base.Transform(), 'C:/U
 # объект кнопки
 button = Base.Button(is_clicked, 'background', None, 'bg', Base.Transform(Base.Vector2(200, 200)), 'C:/Users\Danya/RedPlanet-Game/sprites/button.png')
 
+platform = Base.SpriteObject('platform', None, 'platform', Base.Transform(Base.Vector2(200, 500)), 'C:/Users\Danya/RedPlanet-Game/sprites/platform.png')
+
+
 while game:
     background.paint(screen)
     for event in pygame.event.get():
@@ -38,9 +41,10 @@ while game:
         player.transform.translate(2)
     elif keys[pygame.K_w]:
         player.transform.translate(0, -2)
-
+    player.transform.translate(0, 1)
     player.paint(screen)
-    button.paint(screen)
+    platform.paint(screen)
+
     pygame.display.update()
 
 pygame.quit()

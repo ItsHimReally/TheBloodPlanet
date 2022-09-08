@@ -110,6 +110,26 @@ class AudioPlayer(Object):
         self.sound.play()
 
 
+# class Animation(SpriteObject):
+#     def __init__(self, anim_obj_name='Game Object', anim_obj_parent=None, anim_obj_tag='Object',
+#                  anim_obj_transform=Transform(), image_paths=None):
+#         self.count = 0
+#         self.frames = []
+#         if image_paths:
+#             for item in image_paths:
+#                 self.frames.append(pygame.image.load(item))
+#         else:
+#             logging.info(f'Frames path has not been defined!')
+#
+#         super(Animation, self).__init__(sprite_obj_name=anim_obj_name, sprite_obj_parent=anim_obj_parent,
+#                                          sprite_obj_tag=anim_obj_tag, sprite_obj_transform=anim_obj_transform)
+#
+#     def paint(self, screen):
+#         self.sprite = self.frames[self.count]
+#         self.count += 1
+#         super(Animation, self).paint(screen)
+
+
 class Animation(SpriteObject):
     def __init__(self, anim_obj_name='Game Object', anim_obj_parent=None, anim_obj_tag='Object',
                  anim_obj_transform=Transform(), image_paths=None):
@@ -129,16 +149,30 @@ class Animation(SpriteObject):
         self.count += 1
         super(Animation, self).paint(screen)
 
+class Movable(SpriteObject):
+    def __init__(self, movable_obj_name='Movable Object', movable_obj_parent=None, movable_obj_tag='Movable',
+                 movable_obj_transform=Transform(), movable_image_path=None, movable_obj_velocity_x=5, movable_obj_acceleration=1):
+        self.transform = movable_obj_transform
+        self.transform.velocity_x = movable_obj_velocity_x
+        self.transform.acceleration = movable_obj_acceleration
+        self.on_ground = True
+        super(Movable, self).__init__(sprite_obj_name=movable_obj_name, sprite_obj_parent=movable_obj_parent,
+                                         sprite_obj_tag=movable_obj_tag, sprite_obj_transform=movable_obj_transform, image_path=movable_image_path)
 
-class Player(SpriteObject):
+
+class Enemy(Movable):
+    def __init__(self, enemy_obj_name='Enemy Object', enemy_obj_parent=None, enemy_obj_tag='Enemy',
+                 enemy_obj_transform=Transform(), enemy_image_path=None, enemy_obj_velocity_x=5, enemy_obj_acceleration=1):
+        super(Enemy, self).__init__(movable_obj_name=enemy_obj_name, movable_obj_parent=enemy_obj_parent,
+                                         movable_obj_tag=enemy_obj_tag, movable_obj_transform=enemy_obj_transform,
+                                            movable_image_path=enemy_image_path, movable_obj_velocity_x=enemy_obj_velocity_x, movable_obj_acceleration=enemy_obj_acceleration)
+
+class Player(Movable):
     def __init__(self, player_obj_name='Player Object', player_obj_parent=None, player_obj_tag='Player',
                  player_obj_transform=Transform(), player_image_path=None, player_obj_velocity_x=5, player_obj_acceleration=1):
-        self.transform = player_obj_transform
-        self.transform.velocity_x = player_obj_velocity_x
-        self.transform.acceleration = player_obj_acceleration
-        self.on_ground = True
-        super(Player, self).__init__(sprite_obj_name=player_obj_name, sprite_obj_parent=player_obj_parent,
-                                         sprite_obj_tag=player_obj_tag, sprite_obj_transform=player_obj_transform, image_path=player_image_path)
+        super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
+                                         movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
+                                            movable_image_path=player_image_path, movable_obj_velocity_x=player_obj_velocity_x, movable_obj_acceleration=player_obj_acceleration)
     def move(self, keys):
         if keys[pygame.K_SPACE] and self.on_ground:
             self.on_ground = False

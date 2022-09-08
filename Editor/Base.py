@@ -26,6 +26,9 @@ class Transform:
         self.position = tr_position
         self.scale = tr_scale
         self.rotation = tr_rotate
+        self.velocity_x = 0
+        self.velocity_y = 0
+        self.acceleration = 0
 
     '''
     Метод перемещения объекта
@@ -129,13 +132,27 @@ class Animation(SpriteObject):
 
 class Player(SpriteObject):
     def __init__(self, player_obj_name='Player Object', player_obj_parent=None, player_obj_tag='Player',
-                 player_obj_transform=Transform(), player_image_path=None):
+                 player_obj_transform=Transform(), player_image_path=None, player_obj_velocity_x=5, player_obj_acceleration=1):
+        self.transform = player_obj_transform
+        self.transform.velocity_x = player_obj_velocity_x
+        self.transform.acceleration = player_obj_acceleration
+        self.on_ground = True
         super(Player, self).__init__(sprite_obj_name=player_obj_name, sprite_obj_parent=player_obj_parent,
                                          sprite_obj_tag=player_obj_tag, sprite_obj_transform=player_obj_transform, image_path=player_image_path)
     def move(self, keys):
+        if keys[pygame.K_SPACE] and self.on_ground:
+            self.on_ground = False
+            self.transform.velocity_y = -20
         if keys[pygame.K_a]:
-            self.transform.translate(-2)
+            self.transform.translate(-1 * self.transform.velocity_x)
         if keys[pygame.K_d]:
-            self.transform.translate(2)
-        if keys[pygame.K_w]:
-            self.transform.translate(0, -2)
+            self.transform.translate(self.transform.velocity_x)
+        if not self.on_ground:
+            self.fall()
+    def fall(self):
+        if self.transform.velocity_y >= 21:
+            self.transform.velocity_y = 0
+            self.on_ground = True
+            return
+        self.transform.translate(0, self.transform.velocity_y)
+        self.transform.velocity_y += self.transform.acceleration

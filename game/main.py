@@ -25,9 +25,6 @@ while game:
     keys = pygame.key.get_pressed()  # клавиши, которые были нажаты
     player.move(keys)
     # реакции на нажатия клавиш
-
-
-
     player.paint(screen)
     button.paint(screen)
     pygame.display.update()

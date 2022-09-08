@@ -174,7 +174,7 @@ class Player(Movable):
                                          movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
                                             movable_image_path=player_image_path, movable_obj_velocity_x=player_obj_velocity_x, movable_obj_acceleration=player_obj_acceleration)
     def move(self, keys):
-        if keys[pygame.K_SPACE] and self.on_ground:
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.on_ground:
             self.on_ground = False
             self.transform.velocity_y = -20
         if keys[pygame.K_a]:

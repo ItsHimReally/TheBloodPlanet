@@ -71,14 +71,18 @@ class GameObject(Object):
 class SpriteObject(GameObject):
     def __init__(self, sprite_obj_name='Game Object', sprite_obj_parent=None, sprite_obj_tag='Object',
                  sprite_obj_transform=Transform(), image_path=""):
-        self.sprite = pygame.image.load(image_path) if image_path != "" else logging.info(f'Image path has not been defined!')
+        self.sprite = pygame.image.load(image_path) if image_path != "" else logging.info(
+            f'Image path has not been defined!')
 
         super(SpriteObject, self).__init__(game_obj_name=sprite_obj_name, game_obj_parent=sprite_obj_parent,
-                                         game_obj_tag=sprite_obj_tag, game_obj_transform=sprite_obj_transform)
+                                           game_obj_tag=sprite_obj_tag, game_obj_transform=sprite_obj_transform)
 
     def paint(self, screen):
         super(SpriteObject, self).paint()
-        screen.blit(self.sprite, pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x, self.transform.position.y))
+        screen.blit(self.sprite,
+                    pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
+                                self.transform.position.y))
+
 
 '''
 Класс UI элементов
@@ -90,21 +94,22 @@ class Button(SpriteObject):
                  ui_obj_transform=Transform(), ui_image_path=""):
         self.clicked = button_on_clicked
         super(Button, self).__init__(sprite_obj_name=ui_obj_name, sprite_obj_parent=ui_obj_parent,
-                                       sprite_obj_tag=ui_obj_tag, sprite_obj_transform=ui_obj_transform,
-                                       image_path=ui_image_path)
+                                     sprite_obj_tag=ui_obj_tag, sprite_obj_transform=ui_obj_transform,
+                                     image_path=ui_image_path)
 
     def on_click(self):
         if self.sprite.get_rect().collidepoint(pygame.mouse.get_pos()):
             self.clicked()
-        #self.clicked if self.clicked else logging.info(f'Clicked event has not been declared')
+        # self.clicked if self.clicked else logging.info(f'Clicked event has not been declared')
 
 
 class AudioPlayer(Object):
     def __init__(self, audio_player_name='Game Object', audio_player_parent=None, audio_player_tag='Audio',
                  audio_path=''):
-        self.sound = pygame.mixer.Sound(audio_path) if audio_path != '' else logging.info(f'Audio path has not been defined!')
+        self.sound = pygame.mixer.Sound(audio_path) if audio_path != '' else logging.info(
+            f'Audio path has not been defined!')
         super(AudioPlayer, self).__init__(obj_name=audio_player_name, obj_parent=audio_player_parent,
-                                     obj_tag=audio_player_tag)
+                                          obj_tag=audio_player_tag)
 
     def play(self):
         self.sound.play()
@@ -142,37 +147,54 @@ class Animation(SpriteObject):
             logging.info(f'Frames path has not been defined!')
 
         super(Animation, self).__init__(sprite_obj_name=anim_obj_name, sprite_obj_parent=anim_obj_parent,
-                                         sprite_obj_tag=anim_obj_tag, sprite_obj_transform=anim_obj_transform)
+                                        sprite_obj_tag=anim_obj_tag, sprite_obj_transform=anim_obj_transform)
 
     def paint(self, screen):
         self.sprite = self.frames[self.count]
         self.count += 1
         super(Animation, self).paint(screen)
 
+
+class Platform(SpriteObject):
+    def __init__(self, platform_obj_name='Platform Object', platform_obj_parent=None, platform_obj_tag='Platform',
+                 platform_obj_transform=Transform(), platform_image_path=''):
+        super(Platform, self).__init__(sprite_obj_name=platform_obj_name, sprite_obj_parent=platform_obj_parent,
+                                       sprite_obj_tag=platform_obj_tag, sprite_obj_transform=platform_obj_transform,
+                                       image_path=platform_image_path)
+
+
 class Movable(SpriteObject):
     def __init__(self, movable_obj_name='Movable Object', movable_obj_parent=None, movable_obj_tag='Movable',
-                 movable_obj_transform=Transform(), movable_image_path=None, movable_obj_velocity_x=5, movable_obj_acceleration=1):
+                 movable_obj_transform=Transform(), movable_image_path=None, movable_obj_velocity_x=5,
+                 movable_obj_acceleration=1):
         self.transform = movable_obj_transform
         self.transform.velocity_x = movable_obj_velocity_x
         self.transform.acceleration = movable_obj_acceleration
         self.on_ground = True
         super(Movable, self).__init__(sprite_obj_name=movable_obj_name, sprite_obj_parent=movable_obj_parent,
-                                         sprite_obj_tag=movable_obj_tag, sprite_obj_transform=movable_obj_transform, image_path=movable_image_path)
+                                      sprite_obj_tag=movable_obj_tag, sprite_obj_transform=movable_obj_transform,
+                                      image_path=movable_image_path)
 
 
 class Enemy(Movable):
     def __init__(self, enemy_obj_name='Enemy Object', enemy_obj_parent=None, enemy_obj_tag='Enemy',
-                 enemy_obj_transform=Transform(), enemy_image_path=None, enemy_obj_velocity_x=5, enemy_obj_acceleration=1):
+                 enemy_obj_transform=Transform(), enemy_image_path=None, enemy_obj_velocity_x=5,
+                 enemy_obj_acceleration=1):
         super(Enemy, self).__init__(movable_obj_name=enemy_obj_name, movable_obj_parent=enemy_obj_parent,
-                                         movable_obj_tag=enemy_obj_tag, movable_obj_transform=enemy_obj_transform,
-                                            movable_image_path=enemy_image_path, movable_obj_velocity_x=enemy_obj_velocity_x, movable_obj_acceleration=enemy_obj_acceleration)
+                                    movable_obj_tag=enemy_obj_tag, movable_obj_transform=enemy_obj_transform,
+                                    movable_image_path=enemy_image_path, movable_obj_velocity_x=enemy_obj_velocity_x,
+                                    movable_obj_acceleration=enemy_obj_acceleration)
+
 
 class Player(Movable):
     def __init__(self, player_obj_name='Player Object', player_obj_parent=None, player_obj_tag='Player',
-                 player_obj_transform=Transform(), player_image_path=None, player_obj_velocity_x=5, player_obj_acceleration=1):
+                 player_obj_transform=Transform(), player_image_path=None, player_obj_velocity_x=5,
+                 player_obj_acceleration=1):
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
-                                         movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
-                                            movable_image_path=player_image_path, movable_obj_velocity_x=player_obj_velocity_x, movable_obj_acceleration=player_obj_acceleration)
+                                     movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
+                                     movable_image_path=player_image_path, movable_obj_velocity_x=player_obj_velocity_x,
+                                     movable_obj_acceleration=player_obj_acceleration)
+
     def move(self, keys):
         if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.on_ground:
             self.on_ground = False
@@ -183,6 +205,7 @@ class Player(Movable):
             self.transform.translate(self.transform.velocity_x)
         if not self.on_ground:
             self.fall()
+
     def fall(self):
         if self.transform.velocity_y >= 21:
             self.transform.velocity_y = 0

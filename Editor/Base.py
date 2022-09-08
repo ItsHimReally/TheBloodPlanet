@@ -90,8 +90,8 @@ class Button(SpriteObject):
                                        sprite_obj_tag=ui_obj_tag, sprite_obj_transform=ui_obj_transform,
                                        image_path=ui_image_path)
 
-    def on_click(self, mouse_pos):
-        if self.sprite.get_rect().collidepoint(mouse_pos):
+    def on_click(self):
+        if self.sprite.get_rect().collidepoint(pygame.mouse.get_pos()):
             self.clicked()
         #self.clicked if self.clicked else logging.info(f'Clicked event has not been declared')
 

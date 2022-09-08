@@ -21,7 +21,7 @@ while game:
         if event.type == pygame.QUIT:
             game = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            button.on_click(pygame.mouse.get_pos())
+            button.on_click()
     pressed = pygame.mouse.get_pressed()[0]
     keys = pygame.key.get_pressed()  # клавиши, которые были нажаты
     # реакции на нажатия клавиш

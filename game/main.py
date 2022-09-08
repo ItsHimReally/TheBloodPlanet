@@ -3,13 +3,16 @@ import pygame
 
 
 pygame.init()
+clock = pygame.time.Clock()
 screen = pygame.display.set_mode((1600, 900))
 pygame.mouse.set_visible(1)
 pygame.display.set_caption('')
 
 game = True
 # объект игрока
-player = Base.Player('player', None, 'player', Base.Transform(), 'sprites/main.png')
+player = Base.Player('player', None, 'player', Base.Transform(), ['sprites/main.png', 'sprites/null.png'])
+player.add_animation('second', ['sprites/1.png', 'sprites/2.png'], 1000)
+player.set_animation('second', )
 # объект заднего фона
 background = Base.SpriteObject('background', None, 'bg', Base.Transform(), 'sprites/background.png')
 # объект кнопки
@@ -28,6 +31,7 @@ while game:
     player.paint(screen)
     button.paint(screen)
     pygame.display.update()
+    clock.tick(60)
 
 pygame.quit()
 exit()

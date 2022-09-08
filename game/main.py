@@ -2,9 +2,14 @@ from Editor import Base
 import pygame
 
 
-def is_clicked(button_rect, click_rect):
-    if button_rect.collidepoint(click_rect):
-        button.on_click()
+def is_clicked(click_rect, button_obj):
+    if button_obj.sprite.get_rect()[2] + button_obj.sprite.get_rect()[2] >= click_rect[0] and \
+                    click_rect[0] >= button_obj.sprite.get_rect()[2] and \
+                    button_obj.transform.position.x + button_obj.sprite.get_rect()[3] >= click_rect[1] and \
+                    click_rect[1] >= button_obj.transform.position.y:
+        button_obj.on_click()
+
+
 
 
 pygame.init()
@@ -14,13 +19,13 @@ pygame.display.set_caption('')
 
 game = True
 # объект игрока
-player = Base.SpriteObject('player', None, 'player', Base.Transform(), 'C:/Users\Danya/RedPlanet-Game/sprites/main.png')
+player = Base.SpriteObject('player', None, 'player', Base.Transform(), 'sprites/main.png')
 # объект заднего фона
-background = Base.SpriteObject('background', None, 'bg', Base.Transform(), 'C:/Users\Danya/RedPlanet-Game/sprites/background.png')
+background = Base.SpriteObject('background', None, 'bg', Base.Transform(), 'sprites/background.png')
 # объект кнопки
-button = Base.Button(is_clicked, 'background', None, 'bg', Base.Transform(Base.Vector2(200, 200)), 'C:/Users\Danya/RedPlanet-Game/sprites/button.png')
+button = Base.Button(is_clicked, 'background', None, 'bg', Base.Transform(Base.Vector2(500, 500)), 'sprites/button.png')
 
-platform = Base.SpriteObject('platform', None, 'platform', Base.Transform(Base.Vector2(200, 500)), 'C:/Users\Danya/RedPlanet-Game/sprites/platform.png')
+platform = Base.SpriteObject('platform', None, 'platform', Base.Transform(Base.Vector2(200, 500)), 'sprites/platform.png')
 
 
 while game:
@@ -34,7 +39,7 @@ while game:
     # реакции на нажатия клавиш
 
     if pressed:
-        is_clicked(button.sprite.get_rect(), pos)
+        is_clicked(pos, button)
     elif keys[pygame.K_a]:
         player.transform.translate(-2)
     elif keys[pygame.K_d]:
@@ -43,7 +48,7 @@ while game:
         player.transform.translate(0, -2)
     player.transform.translate(0, 1)
     player.paint(screen)
-    platform.paint(screen)
+    button.paint(screen)
 
     pygame.display.update()
 

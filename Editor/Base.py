@@ -125,3 +125,17 @@ class Animation(SpriteObject):
         self.sprite = self.frames[self.count]
         self.count += 1
         super(Animation, self).paint(screen)
+
+
+class Player(SpriteObject):
+    def __init__(self, player_obj_name='Player Object', player_obj_parent=None, player_obj_tag='Player',
+                 player_obj_transform=Transform(), player_image_path=None):
+        super(Player, self).__init__(sprite_obj_name=player_obj_name, sprite_obj_parent=player_obj_parent,
+                                         sprite_obj_tag=player_obj_tag, sprite_obj_transform=player_obj_transform, image_path=player_image_path)
+    def move(self, keys):
+        if keys[pygame.K_a]:
+            self.transform.translate(-2)
+        if keys[pygame.K_d]:
+            self.transform.translate(2)
+        if keys[pygame.K_w]:
+            self.transform.translate(0, -2)

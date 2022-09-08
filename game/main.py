@@ -3,13 +3,13 @@ import pygame
 
 
 pygame.init()
-screen = pygame.display.set_mode()
+screen = pygame.display.set_mode((1600, 900))
 pygame.mouse.set_visible(1)
 pygame.display.set_caption('')
 
 game = True
 # объект игрока
-player = Base.SpriteObject('player', None, 'player', Base.Transform(), 'sprites/main.png')
+player = Base.Player('player', None, 'player', Base.Transform(), 'sprites/main.png')
 # объект заднего фона
 background = Base.SpriteObject('background', None, 'bg', Base.Transform(), 'sprites/background.png')
 # объект кнопки
@@ -22,16 +22,11 @@ while game:
             game = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             button.on_click()
-    pressed = pygame.mouse.get_pressed()[0]
     keys = pygame.key.get_pressed()  # клавиши, которые были нажаты
+    player.move(keys)
     # реакции на нажатия клавиш
 
-    if keys[pygame.K_a]:
-        player.transform.translate(-2)
-    elif keys[pygame.K_d]:
-        player.transform.translate(2)
-    elif keys[pygame.K_w]:
-        player.transform.translate(0, -2)
+
 
     player.paint(screen)
     button.paint(screen)

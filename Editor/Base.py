@@ -166,20 +166,31 @@ class Animation(SpriteObject):
 
 class Movable(Animation):
     def __init__(self, movable_obj_name='Movable Object', movable_obj_parent=None, movable_obj_tag='Movable',
-                 movable_obj_transform=Transform(), movable_image_paths=None, movable_obj_velocity_x=5,
+                 movable_obj_transform=Transform(), movable_image_paths=None, movable_obj_velocity_x=0,
                  movable_obj_acceleration=1):
         self.transform = movable_obj_transform
         self.transform.velocity_x = movable_obj_velocity_x
         self.transform.acceleration = movable_obj_acceleration
+        self.collide_left = False
+        self.collide_right = False
         self.on_ground = True
         super(Movable, self).__init__(anim_obj_name=movable_obj_name, anim_obj_parent=movable_obj_parent,
                                       anim_obj_tag=movable_obj_tag, anim_obj_transform=movable_obj_transform,
                                       image_paths=movable_image_paths)
 
     def check_collision(self, rect):
+        self.collide_left = False
+        self.collide_right = False
+        collision_tolerance = 10
         if self.rect.colliderect(rect.rect):
-            return True
-        return False
+            if abs(rect.rect.top - self.rect.bottom) < collision_tolerance:
+                self.transform.velocity_y *= -1
+            if abs(rect.rect.bottom - self.rect.top) < collision_tolerance:
+                self.transform.velocity_y *= 1
+            if abs(rect.rect.right - self.rect.left) < collision_tolerance:
+                self.collide_left = True
+            if abs(rect.rect.left - self.rect.right) < collision_tolerance:
+                self.collide_right = True
 
 
 class Enemy(Movable):
@@ -206,10 +217,12 @@ class Player(Movable):
         if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.on_ground:
             self.on_ground = False
             self.transform.velocity_y = -20
-        if keys[pygame.K_a]:
-            self.transform.position.x += -1 * self.transform.velocity_x
-            self.rect.move_ip(-1 * self.transform.velocity_x, 0)
-        if keys[pygame.K_d]:
+        if keys[pygame.K_a] and self.transform.velocity_x != 1:
+            self.transform.velocity_x = -5
+            self.transform.position.x += self.transform.velocity_x
+            self.rect.move_ip(self.transform.velocity_x, 0)
+        if keys[pygame.K_d] and self.transform.velocity_x != -1:
+            self.transform.velocity_x = 5
             self.transform.position.x += self.transform.velocity_x
             self.rect.move_ip(self.transform.velocity_x, 0)
         if not self.on_ground:

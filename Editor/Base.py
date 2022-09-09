@@ -72,12 +72,11 @@ class GameObject(Object):
 class SpriteObject(GameObject):
     def __init__(self, sprite_obj_name='Game Object', sprite_obj_parent=None, sprite_obj_tag='Object',
                  sprite_obj_transform=Transform(), image_path=""):
-        self.sprite = pygame.image.load(image_path).convert_alpha() if image_path != "" else logging.info(
+        self.sprite = pygame.transform.scale(pygame.image.load(image_path).convert_alpha(), (sprite_obj_transform.scale.x, sprite_obj_transform.scale.y)) if image_path != "" else logging.info(
             f'Image path has not been defined!')
         # self.sprite = pygame.transform.scale(self.sprite, (self.transform.scale.x, self.transform.scale.y))
         super(SpriteObject, self).__init__(game_obj_name=sprite_obj_name, game_obj_parent=sprite_obj_parent,
                                          game_obj_tag=sprite_obj_tag, game_obj_transform=sprite_obj_transform)
-
 
     def paint(self, screen):
         super(SpriteObject, self).paint()
@@ -196,23 +195,22 @@ class Movable(Animation):
         super(Movable, self).__init__(anim_obj_name=movable_obj_name, anim_obj_parent=movable_obj_parent,
                                          anim_obj_tag=movable_obj_tag, anim_obj_transform=movable_obj_transform, image_paths=movable_image_paths)
 
-    def check_collision(self, rect):
+    def check_collision(self, rect, marked_collisions):
         if self.rect.colliderect(rect.rect):
 
             if abs(self.rect.left - rect.rect.right) <= 10:
-                self.collisions[0] = True
+                marked_collisions[0] = True
 
             if abs(self.rect.top - rect.rect.bottom) <= 10:
-                self.collisions[1] = True
+                marked_collisions[1] = True
+
 
             if abs(self.rect.right - rect.rect.left) <= 10:
-                self.collisions[2] = True
+                marked_collisions[2] = True
 
             if abs(self.rect.bottom - rect.rect.top) <= 10:
-                self.collisions[3] = True
-
-            return True
-        return False
+                marked_collisions[3] = True
+        return marked_collisions
 
 
 class Enemy(Movable):
@@ -244,15 +242,19 @@ class Player(Movable):
         if keys[pygame.K_d] and not self.collisions[2]:
             self.transform.position.x += self.transform.velocity_x
             self.rect.move_ip(self.transform.velocity_x, 0)
+
+        if keys[pygame.K_r]:
+            self.transform.position.y -= 100
+            self.rect.move_ip(0, -100)
         # fall check collision
-        if not self.collisions[3]:
+        if not self.collisions[3] and self.on_ground:
             self.transform.position.y += 10
             self.rect.move_ip(0, 10)
         if not self.on_ground:
             self.jump()
 
     def jump(self):
-        if self.transform.velocity_y >= 1:
+        if self.transform.velocity_y >= 21:
             self.transform.velocity_y = 0
             self.on_ground = True
             self.set_animation('idle')

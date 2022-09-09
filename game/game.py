@@ -12,6 +12,7 @@ def is_clicked(click_rect, button_obj):
 
 
 def start(screen):
+
     game = True
     # объект игрока
     player = Base.SpriteObject('player', None, 'player', Base.Transform(), 'sprites/main.png')

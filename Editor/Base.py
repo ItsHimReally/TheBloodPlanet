@@ -103,15 +103,26 @@ class Button(SpriteObject):
 
 class AudioPlayer(Object):
     def __init__(self, audio_player_name='Game Object', audio_player_parent=None, audio_player_tag='Audio',
-                 audio_path=''):
-        self.sound = pygame.mixer.Sound(audio_path) if audio_path != '' else logging.info(
-            f'Audio path has not been defined!')
+                 audio_paths=['']):
+        self.sound = []
+        self.current_sound
+        for i in audio_paths:
+            self.sound.append(pygame.mixer.Sound(i) if i != '' else logging.info(
+            f'Audio path has not been defined!'))
         super(AudioPlayer, self).__init__(obj_name=audio_player_name, obj_parent=audio_player_parent,
                                           obj_tag=audio_player_tag)
 
-    def play(self):
-        self.sound.play()
+    def play(self, number):
+        self.current_sound = self.sound[number]
+        self.curren_sound.play()
 
+
+    def pause(self):
+        self.current_sound.stop()
+
+
+    def get_current_sound(self):
+        return self.current_sound
 
 class Animation(SpriteObject):
     def __init__(self, anim_obj_name='Game Object', anim_obj_parent=None, anim_obj_tag='Object',

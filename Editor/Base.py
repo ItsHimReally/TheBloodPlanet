@@ -72,6 +72,7 @@ class GameObject(Object):
 class SpriteObject(GameObject):
     def __init__(self, sprite_obj_name='Game Object', sprite_obj_parent=None, sprite_obj_tag='Object',
                  sprite_obj_transform=Transform(), image_path=""):
+        self.sprite_obj_tag = sprite_obj_tag
         self.sprite = pygame.transform.scale(pygame.image.load(image_path).convert_alpha(), (sprite_obj_transform.scale.x, sprite_obj_transform.scale.y)) if image_path != "" else logging.info(
             f'Image path has not been defined!')
         # self.sprite = pygame.transform.scale(self.sprite, (self.transform.scale.x, self.transform.scale.y))
@@ -191,25 +192,35 @@ class Movable(Animation):
         self.transform.velocity_x = movable_obj_velocity_x
         self.transform.acceleration = movable_obj_acceleration
         self.on_ground = True
+        self.on_ladder = False
         self.collisions = [False, False, False, False] #collisions from left top right
         super(Movable, self).__init__(anim_obj_name=movable_obj_name, anim_obj_parent=movable_obj_parent,
                                          anim_obj_tag=movable_obj_tag, anim_obj_transform=movable_obj_transform, image_paths=movable_image_paths)
 
     def check_collision(self, rect, marked_collisions):
-        if self.rect.colliderect(rect.rect):
+        if self.on_ladder:
+            print('on_ladder')
+        self.on_ladder = False
+        if rect.sprite_obj_tag == 'lad':
 
-            if abs(self.rect.left - rect.rect.right) <= 10:
-                marked_collisions[0] = True
+            if self.rect.colliderect(rect.rect):
+                self.on_ladder = True
 
-            if abs(self.rect.top - rect.rect.bottom) <= 10:
-                marked_collisions[1] = True
+        else:
+            if self.rect.colliderect(rect.rect):
+
+                if abs(self.rect.left - rect.rect.right) <= 10:
+                    marked_collisions[0] = True
+
+                if abs(self.rect.top - rect.rect.bottom) <= 10:
+                    marked_collisions[1] = True
 
 
-            if abs(self.rect.right - rect.rect.left) <= 10:
-                marked_collisions[2] = True
+                if abs(self.rect.right - rect.rect.left) <= 10:
+                    marked_collisions[2] = True
 
-            if abs(self.rect.bottom - rect.rect.top) <= 10:
-                marked_collisions[3] = True
+                if abs(self.rect.bottom - rect.rect.top) <= 10:
+                    marked_collisions[3] = True
         return marked_collisions
 
 
@@ -230,10 +241,18 @@ class Player(Movable):
                                             movable_image_paths=player_image_path, movable_obj_velocity_x=player_obj_velocity_x, movable_obj_acceleration=player_obj_acceleration)
     def move(self, keys):
 
-        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.collisions[3] and not self.collisions[1]:
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.collisions[3] and not self.collisions[1] and self.on_ladder is False:
             self.on_ground = False
             self.transform.velocity_y = -20
             self.set_animation('jump')
+        if (keys[pygame.K_w]) and self.on_ladder is True:
+            self.transform.velocity_y = -5
+            self.transform.position.y += self.transform.velocity_y
+            self.rect.move_ip(0, self.transform.velocity_y)
+        if (keys[pygame.K_s]) and self.on_ladder is True:
+            self.transform.velocity_y = 5
+            self.transform.position.y += self.transform.velocity_y
+            self.rect.move_ip(0, self.transform.velocity_y)
         # move left check collision
         if keys[pygame.K_a] and not self.collisions[0]:
             self.transform.position.x += -1 * self.transform.velocity_x

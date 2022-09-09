@@ -22,7 +22,8 @@ background = Base.SpriteObject('background', None, 'bg', Base.Transform(Base.Vec
 # button = Base.Button(lambda: print("clicked!!"), 'background', None, 'bg', Base.Transform(Base.Vector2(200, 200)), 'sprites/button.png')
 ceil = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 240)), 'sprites/1.png')
 floor = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 640), Base.Vector2(1600, 450)), 'sprites/1.png')
-level_objects = [ceil, floor]
+ladder = Base.SpriteObject('testObject', None, 'lad', Base.Transform(Base.Vector2(400, 140), Base.Vector2(200, 500)), 'sprites/1.png')
+level_objects = [ceil, floor, ladder]
 while game:
     background.paint(screen)
     # pygame.draw.rect(screen, (0, 255, 255), background.rect)
@@ -30,11 +31,11 @@ while game:
 
         if event.type == pygame.QUIT:
             game = False
-        # if event.type == pygame.MOUSEBUTTONDOWN:
-        #     button.on_click()
+        # if event.type == pygame.MOUSEBUTTONDOWN:d
+        #     button.on_click()d
     keys = pygame.key.get_pressed()  # клавиши, которые были нажаты
     player.move(keys)
-    # реакции на нажатия клавиш
+    # реакции на нажатия клавишd
     # rectangle.paint(screen)
     a = [False, False, False, False]
     for level_object in level_objects:
@@ -44,8 +45,9 @@ while game:
     # pygame.draw.rect(screen, (0, 0, 255), floor.rect)
     # pygame.draw.rect(screen, (0, 0, 255), player.rect)
     player.paint(screen)
-    # button.paint(screen)
-    print(player.collisions)
+    ladder.paint(screen)
+    # button.paint(screen)d
+    # print(player.collisions)
     pygame.display.update()
     clock.tick(60)
     if keys[pygame.K_ESCAPE]:

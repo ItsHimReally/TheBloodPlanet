@@ -123,22 +123,48 @@ class Animation(SpriteObject):
         self.current_animation = []
         self.loop = True
         self.ended = False
-        self.add_animation('idle', image_paths, 150)
+        self.animation_delay = 0
+        self.last_frame_time = 0
+        self.current_frame = 0
+        self.add_animation('idle', image_paths, 100)
         self.set_animation('idle')
+
+
         super(Animation, self).__init__(sprite_obj_name=anim_obj_name, sprite_obj_parent=anim_obj_parent,
                                          sprite_obj_tag=anim_obj_tag, sprite_obj_transform=anim_obj_transform)
 
+    # def paint(self, screen):
+    #     if (not self.loop and not self.ended) or self.loop:
+    #         if len(self.current_animation) > 1:
+    #             frame = ((pygame.time.get_ticks() // self.animation_delay) % len(self.current_animation))
+    #             if frame == len(self.current_animation) - 1:
+    #                 self.ended = True
+    #             self.sprite = self.current_animation[frame]
+    #         else:
+    #             self.sprite = self.current_animation[0]
+    #     else:
+    #         self.sprite = self.current_animation[len(self.current_animation) - 1]
+    #     super(Animation, self).paint(screen)
+
     def paint(self, screen):
-        if (not self.loop and not self.ended) or self.loop:
-            if len(self.current_animation) > 1:
-                frame = ((pygame.time.get_ticks() // self.animation_delay) % len(self.current_animation))
-                if frame == len(self.current_animation) - 1:
-                    self.ended = True
-                self.sprite = self.current_animation[frame]
+        # if (not self.loop and not self.ended) or self.loop:
+        #     if len(self.current_animation) > 1:
+        #         frame = ((pygame.time.get_ticks() // self.animation_delay) % len(self.current_animation))
+        #         if frame == len(self.current_animation) - 1:
+        #             self.ended = True
+        #         self.sprite = self.current_animation[frame]
+        #     else:
+        #         self.sprite = self.current_animation[0]
+        # else:
+        #     self.sprite = self.current_animation[len(self.current_animation) - 1]
+        self.sprite = self.current_animation[self.current_frame]
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_frame_time >= self.animation_delay:
+            self.last_frame_time = current_time
+            if self.current_frame < len(self.current_animation) - 1:
+                self.current_frame += 1
             else:
-                self.sprite = self.current_animation[0]
-        else:
-            self.sprite = self.current_animation[len(self.current_animation) - 1]
+                self.current_frame = 0
         super(Animation, self).paint(screen)
 
     def add_animation(self, name, image_paths, animation_delay):
@@ -152,6 +178,7 @@ class Animation(SpriteObject):
             logging.info(f'Frames path has not been defined!')
     def set_animation(self, animation, loop=True):
         self.current_animation = self.animations[animation]
+        self.current_frame = 0
         self.animation_delay = self.animations_fps[animation]
         self.loop = loop
         self.ended = False
@@ -165,11 +192,25 @@ class Movable(Animation):
         self.transform.velocity_x = movable_obj_velocity_x
         self.transform.acceleration = movable_obj_acceleration
         self.on_ground = True
+        self.collisions = [False, False, False, False] #collisions from left top right
         super(Movable, self).__init__(anim_obj_name=movable_obj_name, anim_obj_parent=movable_obj_parent,
                                          anim_obj_tag=movable_obj_tag, anim_obj_transform=movable_obj_transform, image_paths=movable_image_paths)
 
     def check_collision(self, rect):
         if self.rect.colliderect(rect.rect):
+
+            if abs(self.rect.left - rect.rect.right) <= 10:
+                self.collisions[0] = True
+
+            if abs(self.rect.top - rect.rect.bottom) <= 10:
+                self.collisions[1] = True
+
+            if abs(self.rect.right - rect.rect.left) <= 10:
+                self.collisions[2] = True
+
+            if abs(self.rect.bottom - rect.rect.top) <= 10:
+                self.collisions[3] = True
+
             return True
         return False
 
@@ -190,22 +231,34 @@ class Player(Movable):
                                          movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
                                             movable_image_paths=player_image_path, movable_obj_velocity_x=player_obj_velocity_x, movable_obj_acceleration=player_obj_acceleration)
     def move(self, keys):
-        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.on_ground:
+
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.collisions[3] and not self.collisions[1]:
             self.on_ground = False
             self.transform.velocity_y = -20
-        if keys[pygame.K_a]:
+            self.set_animation('jump')
+        # move left check collision
+        if keys[pygame.K_a] and not self.collisions[0]:
             self.transform.position.x += -1 * self.transform.velocity_x
             self.rect.move_ip(-1 * self.transform.velocity_x, 0)
-        if keys[pygame.K_d]:
+        # move right check collision
+        if keys[pygame.K_d] and not self.collisions[2]:
             self.transform.position.x += self.transform.velocity_x
             self.rect.move_ip(self.transform.velocity_x, 0)
+        # fall check collision
+        if not self.collisions[3]:
+            self.transform.position.y += 10
+            self.rect.move_ip(0, 10)
         if not self.on_ground:
-            self.fall()
-    def fall(self):
-        if self.transform.velocity_y >= 21:
+            self.jump()
+
+    def jump(self):
+        if self.transform.velocity_y >= 1:
             self.transform.velocity_y = 0
             self.on_ground = True
+            self.set_animation('idle')
             return
+        if self.collisions[1]:
+            self.transform.velocity_y = 0
         self.transform.position.y += self.transform.velocity_y
         self.rect.move_ip(0, self.transform.velocity_y)
         self.transform.velocity_y += self.transform.acceleration

@@ -32,10 +32,10 @@ class Transform:
 
     '''
     Метод перемещения объекта
-    
+
     :param shift_x: смещение по оси абсцисс
     :param shift_y: смещение по оси ординат
-    
+
     '''
 
     def translate(self, shift_x=0, shift_y=0):
@@ -65,23 +65,26 @@ class GameObject(Object):
     def __init__(self, game_obj_name='Game Object', game_obj_parent=None, game_obj_tag='Object',
                  game_obj_transform=Transform()):
         self.transform = game_obj_transform
+        self.rect = pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
+                                self.transform.scale.y)
         super(GameObject, self).__init__(obj_name=game_obj_name, obj_parent=game_obj_parent, obj_tag=game_obj_tag)
 
 
 class SpriteObject(GameObject):
     def __init__(self, sprite_obj_name='Game Object', sprite_obj_parent=None, sprite_obj_tag='Object',
                  sprite_obj_transform=Transform(), image_path=""):
-        self.sprite = pygame.image.load(image_path) if image_path != "" else logging.info(
+        self.sprite = pygame.image.load(image_path).convert_alpha() if image_path != "" else logging.info(
             f'Image path has not been defined!')
-
+        # self.sprite = pygame.transform.scale(self.sprite, (self.transform.scale.x, self.transform.scale.y))
         super(SpriteObject, self).__init__(game_obj_name=sprite_obj_name, game_obj_parent=sprite_obj_parent,
                                            game_obj_tag=sprite_obj_tag, game_obj_transform=sprite_obj_transform)
 
     def paint(self, screen):
         super(SpriteObject, self).paint()
+
         screen.blit(self.sprite,
                     pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
-                                self.transform.position.y))
+                                self.transform.scale.y))
 
 
 '''
@@ -115,65 +118,68 @@ class AudioPlayer(Object):
         self.sound.play()
 
 
-# class Animation(SpriteObject):
-#     def __init__(self, anim_obj_name='Game Object', anim_obj_parent=None, anim_obj_tag='Object',
-#                  anim_obj_transform=Transform(), image_paths=None):
-#         self.count = 0
-#         self.frames = []
-#         if image_paths:
-#             for item in image_paths:
-#                 self.frames.append(pygame.image.load(item))
-#         else:
-#             logging.info(f'Frames path has not been defined!')
-#
-#         super(Animation, self).__init__(sprite_obj_name=anim_obj_name, sprite_obj_parent=anim_obj_parent,
-#                                          sprite_obj_tag=anim_obj_tag, sprite_obj_transform=anim_obj_transform)
-#
-#     def paint(self, screen):
-#         self.sprite = self.frames[self.count]
-#         self.count += 1
-#         super(Animation, self).paint(screen)
-
-
 class Animation(SpriteObject):
     def __init__(self, anim_obj_name='Game Object', anim_obj_parent=None, anim_obj_tag='Object',
                  anim_obj_transform=Transform(), image_paths=None):
-        self.count = 0
         self.frames = []
-        if image_paths:
-            for item in image_paths:
-                self.frames.append(pygame.image.load(item))
-        else:
-            logging.info(f'Frames path has not been defined!')
-
+        self.animations = {}
+        self.animations_fps = {}
+        self.current_animation = []
+        self.loop = True
+        self.ended = False
+        self.add_animation('idle', image_paths, 150)
+        self.set_animation('idle')
         super(Animation, self).__init__(sprite_obj_name=anim_obj_name, sprite_obj_parent=anim_obj_parent,
                                         sprite_obj_tag=anim_obj_tag, sprite_obj_transform=anim_obj_transform)
 
     def paint(self, screen):
-        self.sprite = self.frames[self.count]
-        self.count += 1
+        if (not self.loop and not self.ended) or self.loop:
+            if len(self.current_animation) > 1:
+                frame = ((pygame.time.get_ticks() // self.animation_delay) % len(self.current_animation))
+                if frame == len(self.current_animation) - 1:
+                    self.ended = True
+                self.sprite = self.current_animation[frame]
+            else:
+                self.sprite = self.current_animation[0]
+        else:
+            self.sprite = self.current_animation[len(self.current_animation) - 1]
         super(Animation, self).paint(screen)
 
+    def add_animation(self, name, image_paths, animation_delay):
+        self.frames = []
+        if image_paths:
+            for item in image_paths:
+                self.frames.append(pygame.transform.scale(pygame.image.load(item).convert_alpha(),
+                                                          (self.transform.scale.x, self.transform.scale.y)))
+            self.animations.update({name: self.frames})
+            self.animations_fps.update({name: animation_delay})
+        else:
+            logging.info(f'Frames path has not been defined!')
 
-class Platform(SpriteObject):
-    def __init__(self, platform_obj_name='Platform Object', platform_obj_parent=None, platform_obj_tag='Platform',
-                 platform_obj_transform=Transform(), platform_image_path=''):
-        super(Platform, self).__init__(sprite_obj_name=platform_obj_name, sprite_obj_parent=platform_obj_parent,
-                                       sprite_obj_tag=platform_obj_tag, sprite_obj_transform=platform_obj_transform,
-                                       image_path=platform_image_path)
+    def set_animation(self, animation, loop=True):
+        self.current_animation = self.animations[animation]
+        self.animation_delay = self.animations_fps[animation]
+        self.loop = loop
+        self.ended = False
+        # self.frame = self.animations[animation][0]
 
 
-class Movable(SpriteObject):
+class Movable(Animation):
     def __init__(self, movable_obj_name='Movable Object', movable_obj_parent=None, movable_obj_tag='Movable',
-                 movable_obj_transform=Transform(), movable_image_path=None, movable_obj_velocity_x=5,
+                 movable_obj_transform=Transform(), movable_image_paths=None, movable_obj_velocity_x=5,
                  movable_obj_acceleration=1):
         self.transform = movable_obj_transform
         self.transform.velocity_x = movable_obj_velocity_x
         self.transform.acceleration = movable_obj_acceleration
         self.on_ground = True
-        super(Movable, self).__init__(sprite_obj_name=movable_obj_name, sprite_obj_parent=movable_obj_parent,
-                                      sprite_obj_tag=movable_obj_tag, sprite_obj_transform=movable_obj_transform,
-                                      image_path=movable_image_path)
+        super(Movable, self).__init__(anim_obj_name=movable_obj_name, anim_obj_parent=movable_obj_parent,
+                                      anim_obj_tag=movable_obj_tag, anim_obj_transform=movable_obj_transform,
+                                      image_paths=movable_image_paths)
+
+    def check_collision(self, rect):
+        if self.rect.colliderect(rect.rect):
+            return True
+        return False
 
 
 class Enemy(Movable):
@@ -182,7 +188,7 @@ class Enemy(Movable):
                  enemy_obj_acceleration=1):
         super(Enemy, self).__init__(movable_obj_name=enemy_obj_name, movable_obj_parent=enemy_obj_parent,
                                     movable_obj_tag=enemy_obj_tag, movable_obj_transform=enemy_obj_transform,
-                                    movable_image_path=enemy_image_path, movable_obj_velocity_x=enemy_obj_velocity_x,
+                                    movable_image_paths=enemy_image_path, movable_obj_velocity_x=enemy_obj_velocity_x,
                                     movable_obj_acceleration=enemy_obj_acceleration)
 
 
@@ -192,7 +198,8 @@ class Player(Movable):
                  player_obj_acceleration=1):
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
                                      movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
-                                     movable_image_path=player_image_path, movable_obj_velocity_x=player_obj_velocity_x,
+                                     movable_image_paths=player_image_path,
+                                     movable_obj_velocity_x=player_obj_velocity_x,
                                      movable_obj_acceleration=player_obj_acceleration)
 
     def move(self, keys):
@@ -200,9 +207,11 @@ class Player(Movable):
             self.on_ground = False
             self.transform.velocity_y = -20
         if keys[pygame.K_a]:
-            self.transform.translate(-1 * self.transform.velocity_x)
+            self.transform.position.x += -1 * self.transform.velocity_x
+            self.rect.move_ip(-1 * self.transform.velocity_x, 0)
         if keys[pygame.K_d]:
-            self.transform.translate(self.transform.velocity_x)
+            self.transform.position.x += self.transform.velocity_x
+            self.rect.move_ip(self.transform.velocity_x, 0)
         if not self.on_ground:
             self.fall()
 
@@ -211,5 +220,14 @@ class Player(Movable):
             self.transform.velocity_y = 0
             self.on_ground = True
             return
-        self.transform.translate(0, self.transform.velocity_y)
+        self.transform.position.y += self.transform.velocity_y
+        self.rect.move_ip(0, self.transform.velocity_y)
         self.transform.velocity_y += self.transform.acceleration
+
+
+class Platform(SpriteObject):
+    def __init__(self, platform_obj_name='Platform Object', platform_obj_parent=None, platform_obj_tag='Platform',
+                 platform_obj_transform=Transform(), platform_image_path=''):
+        super(Platform, self).__init__(sprite_obj_name=platform_obj_name, sprite_obj_parent=platform_obj_parent,
+                                       sprite_obj_tag=platform_obj_tag, sprite_obj_transform=platform_obj_transform,
+                                       image_path=platform_image_path)

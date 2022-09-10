@@ -193,6 +193,24 @@ class Movable(Animation):
                                       anim_obj_tag=movable_obj_tag, anim_obj_transform=movable_obj_transform,
                                       image_paths=movable_image_paths)
 
+    def move(self, keys):
+        # move left check collision
+        if keys[pygame.K_a] and not self.collisions[0]:
+            self.transform.translate(-1 * self.transform.velocity_x, 0)
+
+        # move right check collision
+        if keys[pygame.K_d] and not self.collisions[2]:
+            self.transform.translate(self.transform.velocity_x, 0)
+
+        if keys[pygame.K_r]:
+            self.transform.translate(0, -100)
+
+        # fall check collision
+        if not self.collisions[3] and self.on_ground:
+            self.transform.translate(0, 10)
+
+
+
     def check_collision(self, rect, marked_collisions):
         if self.transform.rect.colliderect(rect.transform.rect):
 
@@ -239,6 +257,7 @@ class Enemy(Movable):
         self.dead = False
         self.start_pos = start_vector
         self.finish_pos = finish_vector
+        self.infected = False
 
         self.state = PatrolEnemyState(finish_vector)
 
@@ -250,8 +269,8 @@ class Enemy(Movable):
                                     movable_obj_velocity_y=enemy_obj_velocity_y,
                                     movable_obj_acceleration=enemy_obj_acceleration)
 
-    def move(self):
-        if not self.dead:
+    def move(self, keys):
+        if not self.dead and not self.infected:
             k = 1 if ((self.transform.position.x - self.state.next_position.x) * -1) >= 0 else -1
 
             if k == 1:
@@ -266,6 +285,8 @@ class Enemy(Movable):
                     self.die()
 
             self.transform.translate(self.transform.velocity_x * k, 0)
+        else:
+            super().move(keys)
 
     def die(self):
         self.set_animation('Die', loop=False)
@@ -287,22 +308,7 @@ class Player(Movable):
             self.on_ground = False
             self.transform.velocity_y = -20
             self.set_animation('jump')
-
-        # move left check collision
-        if keys[pygame.K_a] and not self.collisions[0]:
-            self.transform.translate(-1 * self.transform.velocity_x, 0)
-
-        # move right check collision
-        if keys[pygame.K_d] and not self.collisions[2]:
-            self.transform.translate(self.transform.velocity_x, 0)
-
-        if keys[pygame.K_r]:
-            self.transform.translate(0, -100)
-
-        # fall check collision
-        if not self.collisions[3] and self.on_ground:
-            self.transform.translate(0, 10)
-
+        super().move(keys)
         if not self.on_ground:
             self.jump()
 

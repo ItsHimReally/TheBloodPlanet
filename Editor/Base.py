@@ -428,7 +428,7 @@ class Room:
             # print(1)
             Level.get_level().current_room = self.exit[1]
             player.transform.translate(self.exit[2][0] - player.transform.position.x,
-                                       self.exit[2][1] - player.transform.position.x)
+                                       self.exit[2][1] - player.transform.position.y)
             # print(self.exit[1])
             # print(Level.get_level().current_room)
             return

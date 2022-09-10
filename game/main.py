@@ -80,6 +80,7 @@ colliders2 = [
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(80, 544), Base.Vector2(80, 80))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(80, 619), Base.Vector2(160, 90))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1515, 620), Base.Vector2(90, 100))),
+Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 167), Base.Vector2(10, 100))),
 ]
 
 enemy2 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500), Base.Vector2(70, 150)),
@@ -98,18 +99,18 @@ enemy2.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png
                             'sprites/solider without parasite/shooter die/5.png',
                             'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
 # colliders = [floor, ceil, left_wall, right_wall, floor_vent, box_right]
-colliders1 = [
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 170))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 700), Base.Vector2(1600, 450))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(180, 257), Base.Vector2(1437, 42))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 170), Base.Vector2(82, 699))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1520, 300), Base.Vector2(81, 447))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1364, 620), Base.Vector2(85, 81))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1444, 539), Base.Vector2(77, 161))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(82, 460), Base.Vector2(82, 240))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(163, 620), Base.Vector2(161, 80))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(183, 544), Base.Vector2(81, 76))),
-]
+# colliders1 = [
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 170))),
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 700), Base.Vector2(1600, 450))),
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(180, 257), Base.Vector2(1437, 42))),
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 170), Base.Vector2(82, 699))),
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1520, 300), Base.Vector2(81, 447))),
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1364, 620), Base.Vector2(85, 81))),
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1444, 539), Base.Vector2(77, 161))),
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(82, 460), Base.Vector2(82, 240))),
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(163, 620), Base.Vector2(161, 80))),
+#     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(183, 544), Base.Vector2(81, 76))),
+# ]
 
 room2 = Base.Room(background2, [enemy2], colliders=colliders2)
 
@@ -120,8 +121,9 @@ background3 = Base.SpriteObject('background', None, 'bg',
                                'sprites/Levels/Level_2.png')
 
 colliders3 = [
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1595, 65), Base.Vector2(4, 194))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 863), Base.Vector2(726, 34))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(704, 769), Base.Vector2(895, 130))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(704, 775), Base.Vector2(895, 130))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 768), Base.Vector2(639, 22))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(61, 770))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 63))),
@@ -136,8 +138,11 @@ colliders3 = [
 room3 = Base.Room(background3, [enemy1], colliders=colliders3)
 
 exit1 = [Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1599, 172), Base.Vector2(10, 80))), room2, (3, 169)]
+exit2 = [Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1596, 279), Base.Vector2(10, 400))), room3, (1500, 150)]
+exit3 = [Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(0, 0))), room3, (0, 0)]
 room1.set_exit(exit1)
-room2.set_exit(exit1)
+room2.set_exit(exit2)
+room3.set_exit(exit3)
 
 level1 = Base.Level([room1, room2, room3])
 level1.current_room = room1

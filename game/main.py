@@ -60,24 +60,18 @@ while game:
 
     keys = pygame.key.get_pressed()  # клавиши, которые были нажаты
     player.move(keys)
-    enemy.move(keys)
+    enemy.move()
 
     # реакции на нажатия клавиш
 
     a = [False, False, False, False]
-    b = [False, False, False, False]
     for level_object in level_objects:
         a = player.check_collision(level_object, a)
         player.collisions = a
-        b = enemy.check_collision(level_object, b)
-        enemy.collisions = b
 
     for item in painted_objects:
         item.paint(screen)
 
-    if keys[pygame.K_e]:
-        enemy.infected = True
-        enemy.transform.velocity_x = player.transform.velocity_x
     pygame.display.update()
     clock.tick(60)
     if keys[pygame.K_ESCAPE]:

@@ -394,8 +394,8 @@ class Room:
     def paint(self, player, screen):
         self.background.paint(screen)
 
-        for collider in self.colliders:
-            pygame.draw.rect(screen, (255, 0, 0), collider.transform.rect)
+        # for collider in self.colliders:
+        #     pygame.draw.rect(screen, (255, 0, 0), collider.transform.rect)
 
         for enemy in self.enemies:
             enemy.paint(screen)

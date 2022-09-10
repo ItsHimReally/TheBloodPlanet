@@ -11,7 +11,7 @@ game = True
 
 # объект игрока
 multiplier = 5
-player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(1400, 170), Base.Vector2(20 * multiplier, 17 * multiplier)),
+player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(200, 170), Base.Vector2(20 * multiplier, 17 * multiplier)),
                      ['sprites/Slime/Idle/idle_0.png', 'sprites/Slime/Idle/idle_1.png', 'sprites/Slime/Idle/idle_2.png',
                       'sprites/Slime/Idle/idle_3.png', 'sprites/Slime/Idle/idle_4.png'])
 player_jump_animation = []
@@ -137,12 +137,23 @@ colliders3 = [
 
 room3 = Base.Room(background3, [enemy1], colliders=colliders3)
 
+colliders4 = [
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 899), Base.Vector2(1600, 10))),
+]
+multiplier = 6
+background4 = Base.SpriteObject('background', None, 'bg',
+                               Base.Transform(Base.Vector2(0, 0), Base.Vector2(315 * multiplier, 136 * multiplier)),
+                               'sprites/Levels/Level_3.png')
+
+room4 = Base.Room(background4, [enemy1], colliders=colliders4)
+
 exit1 = [Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1599, 172), Base.Vector2(10, 80))), room2, (3, 169)]
 exit2 = [Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1596, 279), Base.Vector2(10, 400))), room3, (1500, 150)]
-exit3 = [Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(0, 0))), room3, (0, 0)]
+exit3 = [Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1257, 535), Base.Vector2(274, 180))), room4, (800, 800)]
 room1.set_exit(exit1)
 room2.set_exit(exit2)
 room3.set_exit(exit3)
+room4.set_exit(exit1)
 
 level1 = Base.Level([room1, room2, room3])
 level1.current_room = room1

@@ -390,6 +390,7 @@ class Player(Movable):
                  player_obj_transform=Transform(), player_image_path=None, player_obj_velocity_x=5,
                  player_obj_acceleration=1):
         self.host = None
+        self.sound = AudioPlayer(audio_path='audio/take_control.wav')
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
                                      movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
                                      movable_image_paths=player_image_path,
@@ -426,11 +427,13 @@ class Player(Movable):
         if self.host is None:
             for enemy in Level.get_level().current_room.enemies:
                 if self.check_collision(enemy) and not enemy.dead:
+                    self.sound.play()
                     self.host = enemy
                     enemy.infected = True
                     self.activeSelf = False
                     enemy.transform.velocity_x = self.transform.velocity_x
         else:
+            self.sound.play()
             self.activeSelf = True
             self.host.infected = False
             self.host.die()

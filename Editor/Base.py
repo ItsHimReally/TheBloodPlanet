@@ -391,6 +391,7 @@ class Player(Movable):
                  player_obj_acceleration=1):
         self.host = None
         self.sound = AudioPlayer(audio_path='audio/take_control.wav')
+        self.ground_y = None
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
                                      movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
                                      movable_image_paths=player_image_path,
@@ -480,16 +481,16 @@ class Room:
 
         # for collider in self.colliders:
         #     pygame.draw.rect(screen, (255, 0, 0), collider.transform.rect)
-
-        for enemy in self.enemies:
-            enemy.paint(screen)
-            for item in enemy.bullets:
-                item.paint(screen)
+        if self.enemies is not None:
+            for enemy in self.enemies:
+                enemy.paint(screen)
+                for item in enemy.bullets:
+                    item.paint(screen)
 
 
         # for interactive_object in self.interactive_objects:
         #     interactive_object.paint(screen)
-        pygame.draw.rect(screen, (0, 0, 255), self.exit[0].transform.rect)
+        # pygame.draw.rect(screen, (0, 0, 255), self.exit[0].transform.rect)
         player.paint(screen)
 
     def set_exit(self, exit):
@@ -498,16 +499,17 @@ class Room:
     def logic(self, screen, player, keys):
         player.logic(keys)
 
-        for enemy in self.enemies:
-            enemy.logic(keys)
-            if enemy.infected:
-                for current_enemy in self.enemies:
-                    for item in enemy.bullets:
-                        if item.check_collision(current_enemy):
-                            if not current_enemy.infected and not current_enemy.dead:
-                                current_enemy.die()
+        if self.enemies is not None:
+            for enemy in self.enemies:
+                enemy.logic(keys)
+                if enemy.infected:
+                    for current_enemy in self.enemies:
+                        for item in enemy.bullets:
+                            if item.check_collision(current_enemy):
+                                if not current_enemy.infected and not current_enemy.dead:
+                                    current_enemy.die()
 
-            enemy.attack(player)
+                enemy.attack(player)
 
         a = [False, False, False, False]
         for collider in self.colliders:

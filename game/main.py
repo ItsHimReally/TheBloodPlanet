@@ -52,8 +52,10 @@ enemy.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png'
 enemies = [enemy]
 paintable_objects = [enemy, player]
 colliders = [ceil, floor]
-level1 = Base.Level(background, enemies, colliders)
-Base.Level.set_level(level1)
+# level1 = Base.Level(background, enemies, colliders)
+# Base.Level.set_level(level1)
+room1 = Base.Room(background, enemies, colliders)
+level1 = Base.Level([room1])
 while game:
     background.paint(screen)
     for event in pygame.event.get():
@@ -69,7 +71,7 @@ while game:
 
     # реакции на нажатия клавиш
 
-    level1.logic(screen, player, keys)
+    Base.Level.get_level().current_room.logic(screen, player, keys)
 
     pygame.display.update()
     clock.tick(60)

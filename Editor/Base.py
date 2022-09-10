@@ -215,16 +215,16 @@ class Movable(Animation):
     def process_collision(self, rect, marked_collisions):
         if self.check_collision(rect):
 
-            if abs(self.transform.rect.left - rect.transform.rect.right) <= 10:
+            if abs(self.transform.rect.left - rect.transform.rect.right) <= 15:
                 marked_collisions[0] = True
 
-            if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 10:
+            if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 119:
                 marked_collisions[1] = True
 
-            if abs(self.transform.rect.right - rect.transform.rect.left) <= 10:
+            if abs(self.transform.rect.right - rect.transform.rect.left) <= 15:
                 marked_collisions[2] = True
 
-            if abs(self.transform.rect.bottom - rect.transform.rect.top) <= 10:
+            if abs(self.transform.rect.bottom - rect.transform.rect.top) <= 15:
                 marked_collisions[3] = True
 
         return marked_collisions
@@ -388,7 +388,7 @@ class Room:
         self.background = background
         self.colliders = colliders
         self.interactive_objects = interactive_objects
-
+        self.exit = None
         self.enemies = enemies
 
     def paint(self, player, screen):
@@ -400,11 +400,14 @@ class Room:
         for enemy in self.enemies:
             enemy.paint(screen)
 
+
         # for interactive_object in self.interactive_objects:
         #     interactive_object.paint(screen)
-
+        pygame.draw.rect(screen, (0, 0, 255), self.exit[0].transform.rect)
         player.paint(screen)
 
+    def set_exit(self, exit):
+        self.exit = exit
 
     def logic(self, screen, player, keys):
         player.logic(keys)
@@ -420,6 +423,16 @@ class Room:
             else:
                 a = player.host.process_collision(collider, a)
                 player.host.collisions = a
+
+        if player.check_collision(self.exit[0]):
+            # print(1)
+            Level.get_level().current_room = self.exit[1]
+            player.transform.translate(self.exit[2][0] - player.transform.position.x,
+                                       self.exit[2][1] - player.transform.position.x)
+            # print(self.exit[1])
+            # print(Level.get_level().current_room)
+            return
+
 
         self.paint(player, screen)
 

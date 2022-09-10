@@ -11,7 +11,7 @@ game = True
 
 # объект игрока
 multiplier = 5
-player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(209, 170), Base.Vector2(20 * multiplier, 17 * multiplier)),
+player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(1400, 170), Base.Vector2(20 * multiplier, 17 * multiplier)),
                      ['sprites/Slime/Idle/idle_0.png', 'sprites/Slime/Idle/idle_1.png', 'sprites/Slime/Idle/idle_2.png',
                       'sprites/Slime/Idle/idle_3.png', 'sprites/Slime/Idle/idle_4.png'])
 player_jump_animation = []
@@ -41,7 +41,7 @@ enemy1 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500
                     'sprites/solider without parasite/shooter walk/3.png',
                     'sprites/solider without parasite/shooter walk/4.png',
                     'sprites/solider without parasite/shooter walk/5.png'],
-                   enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 488),
+                   enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 225),
                    finish_vector=Base.Vector2(500, 488), enemy_animation_name='walk')
 enemy1.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
 enemy1.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
@@ -56,13 +56,14 @@ colliders1 = [
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 700), Base.Vector2(1600, 450))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(180, 257), Base.Vector2(1437, 42))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 170), Base.Vector2(82, 699))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1520, 257), Base.Vector2(81, 447))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1520, 300), Base.Vector2(81, 447))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1364, 620), Base.Vector2(85, 81))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1444, 539), Base.Vector2(77, 161))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(82, 460), Base.Vector2(82, 240))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(163, 620), Base.Vector2(161, 80))),
-    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(183, 544), Base.Vector2(81, 76)))
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(183, 544), Base.Vector2(81, 76))),
 ]
+
 room1 = Base.Room(background1, [enemy1], colliders=colliders1)
 
 multiplier = 5
@@ -81,7 +82,36 @@ colliders2 = [
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1515, 620), Base.Vector2(90, 100))),
 ]
 
-room2 = Base.Room(background2, [enemy1], colliders=colliders2)
+enemy2 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500), Base.Vector2(70, 150)),
+                   ['sprites/solider without parasite/shooter walk/1.png',
+                    'sprites/solider without parasite/shooter walk/2.png',
+                    'sprites/solider without parasite/shooter walk/3.png',
+                    'sprites/solider without parasite/shooter walk/4.png',
+                    'sprites/solider without parasite/shooter walk/5.png'],
+                   enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 225),
+                   finish_vector=Base.Vector2(500, 488), enemy_animation_name='walk')
+enemy2.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
+enemy2.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
+                            'sprites/solider without parasite/shooter die/2.png',
+                            'sprites/solider without parasite/shooter die/3.png',
+                            'sprites/solider without parasite/shooter die/4.png',
+                            'sprites/solider without parasite/shooter die/5.png',
+                            'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
+# colliders = [floor, ceil, left_wall, right_wall, floor_vent, box_right]
+colliders1 = [
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 170))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 700), Base.Vector2(1600, 450))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(180, 257), Base.Vector2(1437, 42))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 170), Base.Vector2(82, 699))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1520, 300), Base.Vector2(81, 447))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1364, 620), Base.Vector2(85, 81))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1444, 539), Base.Vector2(77, 161))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(82, 460), Base.Vector2(82, 240))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(163, 620), Base.Vector2(161, 80))),
+    Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(183, 544), Base.Vector2(81, 76))),
+]
+
+room2 = Base.Room(background2, [enemy2], colliders=colliders2)
 
 multiplier = 4
 
@@ -105,8 +135,12 @@ colliders3 = [
 
 room3 = Base.Room(background3, [enemy1], colliders=colliders3)
 
-level1 = Base.Level([room1, room2])
-level1.current_room = room3
+exit1 = [Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1599, 172), Base.Vector2(10, 80))), room2, (3, 169)]
+room1.set_exit(exit1)
+room2.set_exit(exit1)
+
+level1 = Base.Level([room1, room2, room3])
+level1.current_room = room1
 # room2 =
 # room3 =
 

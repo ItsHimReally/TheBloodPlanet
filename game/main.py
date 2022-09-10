@@ -53,9 +53,8 @@ while game:
 
     a = [False, False, False, False]
     for level_object in level_objects:
-        a = player.check_collision(level_object, a)
+        a = player.process_collision(level_object, a)
         player.collisions = a
-
     for item in painted_objects:
         item.paint(screen)
 

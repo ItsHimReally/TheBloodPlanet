@@ -190,8 +190,9 @@ class Movable(Animation):
                                       anim_obj_tag=movable_obj_tag, anim_obj_transform=movable_obj_transform,
                                       image_paths=movable_image_paths)
 
-    def check_collision(self, rect, marked_collisions):
-        if self.rect.colliderect(rect.rect):
+    # forbid movement if collides with something
+    def process_collision(self, rect, marked_collisions):
+        if self.check_collision(rect):
 
             if abs(self.rect.left - rect.rect.right) <= 10:
                 marked_collisions[0] = True
@@ -207,6 +208,9 @@ class Movable(Animation):
 
         return marked_collisions
 
+    # true if collides with rect
+    def check_collision(self, rect):
+        return self.rect.colliderect(rect.rect)
 
 '''
 Классы для состояний врага

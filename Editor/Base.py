@@ -425,13 +425,14 @@ class Player(Movable):
 
     def take_control(self):
         if self.host is None:
-            for enemy in Level.get_level().current_room.enemies:
-                if self.check_collision(enemy) and not enemy.dead:
-                    self.sound.play()
-                    self.host = enemy
-                    enemy.infected = True
-                    self.activeSelf = False
-                    enemy.transform.velocity_x = self.transform.velocity_x
+            if Level.get_level().current_room.enemies is not None:
+                for enemy in Level.get_level().current_room.enemies:
+                    if self.check_collision(enemy) and not enemy.dead:
+                        self.sound.play()
+                        self.host = enemy
+                        enemy.infected = True
+                        self.activeSelf = False
+                        enemy.transform.velocity_x = self.transform.velocity_x
         else:
             self.sound.play()
             self.activeSelf = True
@@ -528,6 +529,5 @@ class Room:
             # print(self.exit[1])
             # print(Level.get_level().current_room)
             return
-
 
         self.paint(player, screen)

@@ -134,23 +134,28 @@ colliders3 = [
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1536, 256), Base.Vector2(66, 130))),
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1471, 320), Base.Vector2(66, 64))),
 ]
-
-enemy3 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 800), Base.Vector2(70, 150)),
-                    ['sprites/solider without parasite/shooter walk/1.png',
-                     'sprites/solider without parasite/shooter walk/2.png',
-                     'sprites/solider without parasite/shooter walk/3.png',
-                     'sprites/solider without parasite/shooter walk/4.png',
-                     'sprites/solider without parasite/shooter walk/5.png'],
-                    enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 800),
-                    finish_vector=Base.Vector2(500, 800), enemy_animation_name='walk')
-
-enemy3.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
-enemy3.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
-                             'sprites/solider without parasite/shooter die/2.png',
-                             'sprites/solider without parasite/shooter die/3.png',
-                             'sprites/solider without parasite/shooter die/4.png',
-                             'sprites/solider without parasite/shooter die/5.png',
-                             'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
+multiplier = 3
+enemy3 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500), Base.Vector2(32 * multiplier, 48 * multiplier)),
+                   ['sprites/Scientist/Walk/1.png',
+                    'sprites/Scientist/Walk/2.png',
+                    'sprites/Scientist/Walk/3.png',
+                    'sprites/Scientist/Walk/4.png',
+                    'sprites/Scientist/Walk/5.png',],
+                   enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 240),
+                   finish_vector=Base.Vector2(500, 488), enemy_animation_name='walk', enemy_type='scientist')
+enemy3.add_animation('idle', ['sprites/Scientist/idle.png'], 150, False)
+enemy3.add_animation('Die', ['sprites/Scientist/Die/1.png',
+                            'sprites/Scientist/Die/2.png',
+                            'sprites/Scientist/Die/3.png',
+                            'sprites/Scientist/Die/4.png',
+                            'sprites/Scientist/Die/5.png',
+                            'sprites/Scientist/Die/6.png',
+                             'sprites/Scientist/Die/7.png',
+                             'sprites/Scientist/Die/8.png',
+                             'sprites/Scientist/Die/9.png',
+                             'sprites/Scientist/Die/10.png',
+                             'sprites/Scientist/Die/11.png',
+                             'sprites/Scientist/Die/12.png',], animation_delay=100, x_scale=200)
 
 room3 = Base.Room(background3, [enemy3], colliders=colliders3)
 
@@ -176,24 +181,23 @@ room3.set_exit(exit3)
 room4.set_exit(exit1)
 
 level1 = Base.Level([room1, room2, room3])
-level1.current_room = room1
+level1.current_room = room3
 # room2 =
 # room3 =
 
 a = 0
 b = 0
 
-enemy1.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
-enemy1.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
-                             'sprites/solider without parasite/shooter die/2.png',
-                             'sprites/solider without parasite/shooter die/3.png',
-                             'sprites/solider without parasite/shooter die/4.png',
-                             'sprites/solider without parasite/shooter die/5.png',
-                             'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
+# enemy1.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
+# enemy1.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
+#                              'sprites/solider without parasite/shooter die/2.png',
+#                              'sprites/solider without parasite/shooter die/3.png',
+#                              'sprites/solider without parasite/shooter die/4.png',
+#                              'sprites/solider without parasite/shooter die/5.png',
+#                              'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
 
 # level1 = Base.Level(background, enemies, colliders)
 # Base.Level.set_level(level1)
-level1 = Base.Level([room1])
 while game:
     screen.fill((77, 74, 92))
     for event in pygame.event.get():

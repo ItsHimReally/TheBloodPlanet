@@ -191,6 +191,7 @@ class Movable(Animation):
         self.transform.velocity_x = movable_obj_velocity_x
         self.transform.acceleration = movable_obj_acceleration
         self.on_ground = True
+        self.is_dead = False
         self.collisions = [False, False, False, False] #collisions from left top right
         super(Movable, self).__init__(anim_obj_name=movable_obj_name, anim_obj_parent=movable_obj_parent,
                                          anim_obj_tag=movable_obj_tag, anim_obj_transform=movable_obj_transform, image_paths=movable_image_paths)
@@ -264,3 +265,7 @@ class Player(Movable):
         self.transform.position.y += self.transform.velocity_y
         self.rect.move_ip(0, self.transform.velocity_y)
         self.transform.velocity_y += self.transform.acceleration
+
+
+# class Level:
+#     def __init__(self):

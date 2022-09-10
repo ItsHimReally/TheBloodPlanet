@@ -10,7 +10,7 @@ pygame.display.set_caption('')
 
 game = True
 # объект игрока
-player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(0, 0), Base.Vector2(100, 85)), ['sprites\Slime\Idle\idle_0.png', 'sprites\Slime\Idle\idle_1.png', 'sprites\Slime\Idle\idle_2.png', 'sprites\Slime\Idle\idle_3.png', 'sprites\Slime\Idle\idle_4.png'])
+player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(0, 0), Base.Vector2(100, 85)), ['sprites/Slime/Idle/idle_0.png', 'sprites/Slime/Idle/idle_1.png', 'sprites/Slime/Idle/idle_2.png', 'sprites/Slime/Idle/idle_3.png', 'sprites/Slime/Idle/idle_4.png'])
 player_jump_animation = []
 for i in range(17):
     player_jump_animation.append(f'sprites/Slime/Jump/jump_{i}.png')
@@ -50,7 +50,7 @@ while game:
     clock.tick(60)
     if keys[pygame.K_ESCAPE]:
         pygame.quit()
-        pygame.exit()
+        exit()
         break
 
 pygame.quit()

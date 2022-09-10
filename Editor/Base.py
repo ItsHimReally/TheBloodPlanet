@@ -29,7 +29,8 @@ class Transform:
         self.velocity_x = tr_velocity_x
         self.velocity_y = tr_velocity_y
         self.acceleration = 0
-
+        self.rect = pygame.Rect(self.position.x, self.position.y, self.scale.x,
+                                self.scale.y)
     '''
     Метод перемещения объекта
     
@@ -40,6 +41,7 @@ class Transform:
 
     def translate(self, shift_x=0.0, shift_y=0.0):
         self.position = Vector2(self.position.x + shift_x, self.position.y + shift_y)
+        self.rect.move_ip(shift_x, shift_y)
 
 
 '''
@@ -65,8 +67,7 @@ class GameObject(Object):
     def __init__(self, game_obj_name='Game Object', game_obj_parent=None, game_obj_tag='GameObject',
                  game_obj_transform=Transform()):
         self.transform = game_obj_transform
-        self.rect = pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
-                                self.transform.scale.y)
+
         super(GameObject, self).__init__(obj_name=game_obj_name, obj_parent=game_obj_parent, obj_tag=game_obj_tag)
 
 
@@ -193,18 +194,18 @@ class Movable(Animation):
                                       image_paths=movable_image_paths)
 
     def check_collision(self, rect, marked_collisions):
-        if self.rect.colliderect(rect.rect):
+        if self.transform.rect.colliderect(rect.transform.rect):
 
-            if abs(self.rect.left - rect.rect.right) <= 10:
+            if abs(self.transform.rect.left - rect.transform.rect.right) <= 10:
                 marked_collisions[0] = True
 
-            if abs(self.rect.top - rect.rect.bottom) <= 10:
+            if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 10:
                 marked_collisions[1] = True
 
-            if abs(self.rect.right - rect.rect.left) <= 10:
+            if abs(self.transform.rect.right - rect.transform.rect.left) <= 10:
                 marked_collisions[2] = True
 
-            if abs(self.rect.bottom - rect.rect.top) <= 10:
+            if abs(self.transform.rect.bottom - rect.transform.rect.top) <= 10:
                 marked_collisions[3] = True
 
         return marked_collisions
@@ -290,21 +291,17 @@ class Player(Movable):
         # move left check collision
         if keys[pygame.K_a] and not self.collisions[0]:
             self.transform.translate(-1 * self.transform.velocity_x, 0)
-            self.rect.move_ip(-1 * self.transform.velocity_x, 0)
 
         # move right check collision
         if keys[pygame.K_d] and not self.collisions[2]:
             self.transform.translate(self.transform.velocity_x, 0)
-            self.rect.move_ip(self.transform.velocity_x, 0)
 
         if keys[pygame.K_r]:
             self.transform.translate(0, -100)
-            self.rect.move_ip(0, -100)
 
         # fall check collision
         if not self.collisions[3] and self.on_ground:
             self.transform.translate(0, 10)
-            self.rect.move_ip(0, 10)
 
         if not self.on_ground:
             self.jump()
@@ -320,5 +317,4 @@ class Player(Movable):
             self.transform.velocity_y = 0
 
         self.transform.translate(0, self.transform.velocity_y)
-        self.rect.move_ip(0, self.transform.velocity_y)
         self.transform.velocity_y += self.transform.acceleration

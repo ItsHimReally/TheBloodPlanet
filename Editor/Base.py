@@ -29,7 +29,8 @@ class Transform:
         self.velocity_x = tr_velocity_x
         self.velocity_y = tr_velocity_y
         self.acceleration = 0
-
+        self.rect = pygame.Rect(self.position.x, self.position.y, self.scale.x,
+                                self.scale.y)
     '''
     Метод перемещения объекта
     
@@ -40,6 +41,7 @@ class Transform:
 
     def translate(self, shift_x=0.0, shift_y=0.0):
         self.position = Vector2(self.position.x + shift_x, self.position.y + shift_y)
+        self.rect.move_ip(shift_x, shift_y)
 
 
 '''
@@ -65,8 +67,7 @@ class GameObject(Object):
     def __init__(self, game_obj_name='Game Object', game_obj_parent=None, game_obj_tag='GameObject',
                  game_obj_transform=Transform()):
         self.transform = game_obj_transform
-        self.rect = pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
-                                self.transform.scale.y)
+
         super(GameObject, self).__init__(obj_name=game_obj_name, obj_parent=game_obj_parent, obj_tag=game_obj_tag)
 
 
@@ -81,11 +82,12 @@ class SpriteObject(GameObject):
                                            game_obj_tag=sprite_obj_tag, game_obj_transform=sprite_obj_transform)
 
     def paint(self, screen):
-        super(SpriteObject, self).paint()
+        if self.activeSelf:
+            super(SpriteObject, self).paint()
 
-        screen.blit(self.sprite,
-                    pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
-                                self.transform.scale.y))
+            screen.blit(self.sprite,
+                        pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
+                                    self.transform.scale.y))
 
 
 '''
@@ -120,7 +122,7 @@ class AudioPlayer(Object):
 
 class Animation(SpriteObject):
     def __init__(self, anim_obj_name='Game Object', anim_obj_parent=None, anim_obj_tag='Animation',
-                 anim_obj_transform=Transform(), image_paths=None):
+                 anim_obj_transform=Transform(), image_paths=None, animation_name='idle'):
         self.frames = []
         self.animations = {}
         self.animations_fps = {}
@@ -131,12 +133,13 @@ class Animation(SpriteObject):
         self.animation_delay = 0
         self.last_frame_time = 0
         self.current_frame = 0
+        self.current_animation_name = animation_name
         if image_paths:
-            self.add_animation('idle', image_paths, 100)
+            self.add_animation(animation_name, image_paths, 100)
         else:
             logging.info(f'Idle animation paths has not been defined!')
 
-        self.set_animation('idle')
+        self.set_animation(animation_name)
 
         super(Animation, self).__init__(sprite_obj_name=anim_obj_name, sprite_obj_parent=anim_obj_parent,
                                         sprite_obj_tag=anim_obj_tag, sprite_obj_transform=anim_obj_transform)
@@ -173,13 +176,14 @@ class Animation(SpriteObject):
         self.animation_delay = self.animations_fps[animation]
         self.loop = loop
         self.ended = False
+        self.current_animation_name = animation
 
 
 class Movable(Animation):
     def __init__(self, movable_obj_name='Movable Object', movable_obj_parent=None, movable_obj_tag='Movable',
                  movable_obj_transform=Transform(), movable_image_paths=None, movable_obj_velocity_x=5,
                  movable_obj_velocity_y=5,
-                 movable_obj_acceleration=1):
+                 movable_obj_acceleration=1, movable_animation_name='idle'):
 
         self.transform = movable_obj_transform
         self.transform.velocity_x = movable_obj_velocity_x
@@ -190,25 +194,43 @@ class Movable(Animation):
 
         super(Movable, self).__init__(anim_obj_name=movable_obj_name, anim_obj_parent=movable_obj_parent,
                                       anim_obj_tag=movable_obj_tag, anim_obj_transform=movable_obj_transform,
-                                      image_paths=movable_image_paths)
+                                      image_paths=movable_image_paths, animation_name=movable_animation_name)
 
-    def check_collision(self, rect, marked_collisions):
-        if self.rect.colliderect(rect.rect):
+    def move(self, keys):
+        # move left check collision
+        if keys[pygame.K_a] and not self.collisions[0]:
+            self.transform.translate(-1 * self.transform.velocity_x, 0)
 
-            if abs(self.rect.left - rect.rect.right) <= 10:
+        # move right check collision
+        if keys[pygame.K_d] and not self.collisions[2]:
+            self.transform.translate(self.transform.velocity_x, 0)
+
+        if keys[pygame.K_r]:
+            self.transform.translate(0, -100)
+
+        # fall check collision
+        if not self.collisions[3] and self.on_ground:
+            self.transform.translate(0, 10)
+
+    def process_collision(self, rect, marked_collisions):
+        if self.check_collision(rect):
+
+            if abs(self.transform.rect.left - rect.transform.rect.right) <= 10:
                 marked_collisions[0] = True
 
-            if abs(self.rect.top - rect.rect.bottom) <= 10:
+            if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 10:
                 marked_collisions[1] = True
 
-            if abs(self.rect.right - rect.rect.left) <= 10:
+            if abs(self.transform.rect.right - rect.transform.rect.left) <= 10:
                 marked_collisions[2] = True
 
-            if abs(self.rect.bottom - rect.rect.top) <= 10:
+            if abs(self.transform.rect.bottom - rect.transform.rect.top) <= 10:
                 marked_collisions[3] = True
 
         return marked_collisions
 
+    def check_collision(self, rect):
+        return self.transform.rect.colliderect(rect.transform.rect)
 
 '''
 Классы для состояний врага
@@ -233,11 +255,12 @@ class AttackEnemyState:
 class Enemy(Movable):
     def __init__(self, enemy_obj_name='Enemy Object', enemy_obj_parent=None, enemy_obj_tag='Enemy',
                  enemy_obj_transform=Transform(), enemy_image_path=None, enemy_obj_velocity_x=5, enemy_obj_velocity_y=5,
-                 enemy_obj_acceleration=1, start_vector=Vector2(), finish_vector=Vector2()):
+                 enemy_obj_acceleration=1, start_vector=Vector2(), finish_vector=Vector2(), enemy_animation_name='idle'):
 
         self.dead = False
         self.start_pos = start_vector
         self.finish_pos = finish_vector
+        self.infected = False
 
         self.state = PatrolEnemyState(finish_vector)
 
@@ -247,10 +270,10 @@ class Enemy(Movable):
                                     movable_obj_tag=enemy_obj_tag, movable_obj_transform=transform,
                                     movable_image_paths=enemy_image_path, movable_obj_velocity_x=enemy_obj_velocity_x,
                                     movable_obj_velocity_y=enemy_obj_velocity_y,
-                                    movable_obj_acceleration=enemy_obj_acceleration)
+                                    movable_obj_acceleration=enemy_obj_acceleration, movable_animation_name=enemy_animation_name)
 
-    def move(self):
-        if not self.dead:
+    def move(self, keys):
+        if not self.dead and not self.infected:
             k = 1 if ((self.transform.position.x - self.state.next_position.x) * -1) >= 0 else -1
 
             if k == 1:
@@ -265,6 +288,19 @@ class Enemy(Movable):
                     self.die()
 
             self.transform.translate(self.transform.velocity_x * k, 0)
+        elif not self.dead:
+            if not keys[pygame.K_a] and not keys[pygame.K_d]:
+                self.set_animation('idle')
+            elif self.current_animation_name != 'walk':
+                self.set_animation('walk')
+            if keys[pygame.K_a]:
+                self.flipped = True
+            if keys[pygame.K_d]:
+                self.flipped = False
+            super().move(keys)
+
+    def logic(self, keys):
+        self.move(keys)
 
     def die(self):
         self.set_animation('Die', loop=False)
@@ -275,6 +311,7 @@ class Player(Movable):
     def __init__(self, player_obj_name='Player Object', player_obj_parent=None, player_obj_tag='Player',
                  player_obj_transform=Transform(), player_image_path=None, player_obj_velocity_x=5,
                  player_obj_acceleration=1):
+        self.host = None
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
                                      movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
                                      movable_image_paths=player_image_path,
@@ -286,26 +323,7 @@ class Player(Movable):
             self.on_ground = False
             self.transform.velocity_y = -20
             self.set_animation('jump')
-
-        # move left check collision
-        if keys[pygame.K_a] and not self.collisions[0]:
-            self.transform.translate(-1 * self.transform.velocity_x, 0)
-            self.rect.move_ip(-1 * self.transform.velocity_x, 0)
-
-        # move right check collision
-        if keys[pygame.K_d] and not self.collisions[2]:
-            self.transform.translate(self.transform.velocity_x, 0)
-            self.rect.move_ip(self.transform.velocity_x, 0)
-
-        if keys[pygame.K_r]:
-            self.transform.translate(0, -100)
-            self.rect.move_ip(0, -100)
-
-        # fall check collision
-        if not self.collisions[3] and self.on_ground:
-            self.transform.translate(0, 10)
-            self.rect.move_ip(0, 10)
-
+        super().move(keys)
         if not self.on_ground:
             self.jump()
 
@@ -320,5 +338,73 @@ class Player(Movable):
             self.transform.velocity_y = 0
 
         self.transform.translate(0, self.transform.velocity_y)
-        self.rect.move_ip(0, self.transform.velocity_y)
         self.transform.velocity_y += self.transform.acceleration
+
+    def logic(self, keys):
+        if self.host is None:
+            self.move(keys)
+
+    def take_control(self):
+        if self.host is None:
+            for enemy in Level.current_level.enemies:
+                if self.check_collision(enemy) and not enemy.dead:
+                    self.host = enemy
+                    enemy.infected = True
+                    self.activeSelf = False
+                    enemy.transform.velocity_x = self.transform.velocity_x
+        else:
+            self.activeSelf = True
+            self.host.infected = False
+            self.host.die()
+            self.transform.translate(self.host.transform.position.x - self.transform.position.x,
+                                       self.host.transform.position.y - self.transform.position.y)
+            self.host = None
+
+class Level:
+    current_level = None
+    def __init__(self, background, enemies=None, colliders=None, interactive_objects=None):
+        self.background = background
+        self.colliders = colliders
+        self.interactive_objects = interactive_objects
+
+        self.enemies = enemies
+
+    @staticmethod
+    def get_level():
+        return Level.current_level
+
+    @staticmethod
+    def set_level(level):
+        Level.current_level = level
+
+    def paint(self, player, screen):
+        self.background.paint(screen)
+
+        for enemy in self.enemies:
+            enemy.paint(screen)
+
+        # for interactive_object in self.interactive_objects:
+        #     interactive_object.paint(screen)
+
+        player.paint(screen)
+    def logic(self, screen, player, keys):
+        player.logic(keys)
+
+        for enemy in self.enemies:
+            enemy.logic(keys)
+
+        a = [False, False, False, False]
+        for collider in self.colliders:
+            if player.host is None:
+                a = player.process_collision(collider, a)
+                player.collisions = a
+            else:
+                a = player.host.process_collision(collider, a)
+                player.host.collisions = a
+
+        self.paint(player, screen)
+
+
+
+
+

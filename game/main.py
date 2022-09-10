@@ -82,7 +82,7 @@ while game:
     clock.tick(60)
     if keys[pygame.K_ESCAPE]:
         pygame.quit()
-        pygame.exit()
+        exit()
         break
 
 pygame.quit()

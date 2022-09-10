@@ -32,7 +32,7 @@ enemy = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500)
                    ['sprites/solider without parasite/shooter walk/1.png', 'sprites/solider without parasite/shooter walk/2.png',
                     'sprites/solider without parasite/shooter walk/3.png', 'sprites/solider without parasite/shooter walk/4.png',
                     'sprites/solider without parasite/shooter walk/5.png'],
-                   enemy_obj_velocity_x=1, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 488),
+                   enemy_obj_velocity_x=10, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 488),
                    finish_vector=Base.Vector2(500, 488))
 
 

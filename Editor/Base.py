@@ -244,14 +244,15 @@ class Enemy(Movable):
     def move(self):
         k = 1 if ((self.transform.position.x - self.state.next_position.x) * -1) >= 0 else -1
 
+        print(self.transform.position.x, self.state.next_position.x)
+
         if k == 1:
-            if self.transform.position.x + 1 >= self.state.next_position.x:
+            if self.transform.position.x + self.transform.velocity_x >= self.state.next_position.x:
                 self.state = PatrolEnemyState(self.start_pos)
                 self.flipped = True
-                print(self.flipped)
 
         elif k == -1:
-            if self.transform.position.x - 1 <= self.state.next_position.x:
+            if self.transform.position.x - self.transform.velocity_x <= self.state.next_position.x:
                 self.state = PatrolEnemyState(self.finish_pos)
                 self.flipped = False
 

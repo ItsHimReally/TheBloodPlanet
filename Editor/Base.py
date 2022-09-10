@@ -90,6 +90,9 @@ class SpriteObject(GameObject):
                         pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
                                     self.transform.scale.y))
 
+    def check_collision(self, rect):
+        return self.transform.rect.colliderect(rect.transform.rect)
+
 
 '''
 Класс UI элементов
@@ -232,9 +235,6 @@ class Movable(Animation):
 
         return marked_collisions
 
-    def check_collision(self, rect):
-        return self.transform.rect.colliderect(rect.transform.rect)
-
 
 '''
 Классы для состояний врага
@@ -341,7 +341,6 @@ class Enemy(Movable):
                         Vector2(self.transform.position.x + (200 * (1 if not self.flipped else -1)),
                                 (self.transform.scale.y / 2) + self.transform.position.y - 20), self))
                     self.is_shooted = True
-
                 else:
                     self.time_count += 1
 
@@ -357,6 +356,10 @@ class Enemy(Movable):
             item.move()
 
     def attack(self, player):
+        for item in self.bullets:
+            if item.check_collision(player):
+                self.die()
+
         if not self.dead and not self.is_shooted and not self.infected:
             self.bullets.append(AttackEnemyState().shoot(player.transform.position, self, 6, -3 * (-1 if not self.flipped else 1)))
             self.is_shooted = True
@@ -450,6 +453,7 @@ class Level:
     @current_room.setter
     def current_room(self, room):
         Level.current_room = room
+
 
 class Room:
 

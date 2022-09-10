@@ -148,18 +148,20 @@ class Animation(SpriteObject):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_frame_time >= self.animation_delay:
             self.last_frame_time = current_time
-            if self.current_frame < len(self.current_animation) - 1:  # TODO: заменить тернаром
-                self.current_frame += 1
+            if self.loop:
+                self.current_frame = self.current_frame + 1 if self.current_frame < len(self.current_animation) - 1 else 0
             else:
-                self.current_frame = 0
+                self.current_frame = self.current_frame + 1 if self.current_frame < len(self.current_animation) - 1 else len(self.current_animation) - 1
+
         super(Animation, self).paint(screen)
 
-    def add_animation(self, name, image_paths, animation_delay):
+    def add_animation(self, name, image_paths, animation_delay, x_scale=0, y_scale=0):
         self.frames = []
         if image_paths:
             for item in image_paths:
                 self.frames.append(pygame.transform.scale(pygame.image.load(item).convert_alpha(),
-                                                          (self.transform.scale.x, self.transform.scale.y)))
+                                                          (self.transform.scale.x if x_scale == 0 else x_scale,
+                                                           self.transform.scale.y if y_scale == 0 else y_scale)))
             self.animations.update({name: self.frames})
             self.animations_fps.update({name: animation_delay})
         else:
@@ -218,6 +220,11 @@ class PatrolEnemyState:
         self.next_position = next_pos
 
 
+class AttackEnemyState:
+    def __init__(self, player_transform=Transform()):
+        pass
+
+
 '''
 Класс врага
 '''
@@ -228,6 +235,7 @@ class Enemy(Movable):
                  enemy_obj_transform=Transform(), enemy_image_path=None, enemy_obj_velocity_x=5, enemy_obj_velocity_y=5,
                  enemy_obj_acceleration=1, start_vector=Vector2(), finish_vector=Vector2()):
 
+        self.dead = False
         self.start_pos = start_vector
         self.finish_pos = finish_vector
 
@@ -242,21 +250,25 @@ class Enemy(Movable):
                                     movable_obj_acceleration=enemy_obj_acceleration)
 
     def move(self):
-        k = 1 if ((self.transform.position.x - self.state.next_position.x) * -1) >= 0 else -1
+        if not self.dead:
+            k = 1 if ((self.transform.position.x - self.state.next_position.x) * -1) >= 0 else -1
 
-        print(self.transform.position.x, self.state.next_position.x)
+            if k == 1:
+                if self.transform.position.x + self.transform.velocity_x >= self.state.next_position.x:
+                    self.state = PatrolEnemyState(self.start_pos)
+                    self.flipped = True
 
-        if k == 1:
-            if self.transform.position.x + self.transform.velocity_x >= self.state.next_position.x:
-                self.state = PatrolEnemyState(self.start_pos)
-                self.flipped = True
+            elif k == -1:
+                if self.transform.position.x - self.transform.velocity_x <= self.state.next_position.x:
+                    self.state = PatrolEnemyState(self.finish_pos)
+                    self.flipped = False
+                    self.die()
 
-        elif k == -1:
-            if self.transform.position.x - self.transform.velocity_x <= self.state.next_position.x:
-                self.state = PatrolEnemyState(self.finish_pos)
-                self.flipped = False
+            self.transform.translate(self.transform.velocity_x * k, 0)
 
-        self.transform.translate(self.transform.velocity_x * k, 0)
+    def die(self):
+        self.set_animation('Die', loop=False)
+        self.dead = True
 
 
 class Player(Movable):

@@ -1,7 +1,6 @@
 from Editor import Base
 import pygame
 
-
 pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((1600, 900))
@@ -11,7 +10,9 @@ pygame.display.set_caption('')
 game = True
 
 # объект игрока
-player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(0, 0), Base.Vector2(100, 85)), ['sprites/Slime/Idle/idle_0.png', 'sprites/Slime/Idle/idle_1.png', 'sprites/Slime/Idle/idle_2.png', 'sprites/Slime/Idle/idle_3.png', 'sprites/Slime/Idle/idle_4.png'])
+player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(0, 0), Base.Vector2(100, 85)),
+                     ['sprites/Slime/Idle/idle_0.png', 'sprites/Slime/Idle/idle_1.png', 'sprites/Slime/Idle/idle_2.png',
+                      'sprites/Slime/Idle/idle_3.png', 'sprites/Slime/Idle/idle_4.png'])
 player_jump_animation = []
 
 for i in range(17):
@@ -21,20 +22,32 @@ player.add_animation('jump', player_jump_animation, 50)
 
 # объект заднего фона
 multiplier = 5
-background = Base.SpriteObject('background', None, 'bg', Base.Transform(Base.Vector2(0, 0), Base.Vector2(384 * multiplier, 176 * multiplier)), 'sprites/Levels/level2.png')
+background = Base.SpriteObject('background', None, 'bg',
+                               Base.Transform(Base.Vector2(0, 0), Base.Vector2(384 * multiplier, 176 * multiplier)),
+                               'sprites/Levels/level2.png')
 
-ceil = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 240)), 'sprites/1.png')
-floor = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 640), Base.Vector2(1600, 450)), 'sprites/1.png')
+ceil = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 240)),
+                         'sprites/1.png')
+floor = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 640), Base.Vector2(1600, 450)),
+                          'sprites/1.png')
 level_objects = [ceil, floor]
 
 # создаем врага
 enemy = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500), Base.Vector2(70, 150)),
-                   ['sprites/solider without parasite/shooter walk/1.png', 'sprites/solider without parasite/shooter walk/2.png',
-                    'sprites/solider without parasite/shooter walk/3.png', 'sprites/solider without parasite/shooter walk/4.png',
+                   ['sprites/solider without parasite/shooter walk/1.png',
+                    'sprites/solider without parasite/shooter walk/2.png',
+                    'sprites/solider without parasite/shooter walk/3.png',
+                    'sprites/solider without parasite/shooter walk/4.png',
                     'sprites/solider without parasite/shooter walk/5.png'],
-                   enemy_obj_velocity_x=10, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 488),
+                   enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 488),
                    finish_vector=Base.Vector2(500, 488))
 
+enemy.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
+                            'sprites/solider without parasite/shooter die/2.png',
+                            'sprites/solider without parasite/shooter die/3.png',
+                            'sprites/solider without parasite/shooter die/4.png',
+                            'sprites/solider without parasite/shooter die/5.png',
+                            'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
 
 painted_objects = [enemy, player]
 

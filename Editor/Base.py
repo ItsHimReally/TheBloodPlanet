@@ -396,14 +396,14 @@ class Room:
 
         # for collider in self.colliders:
         #     pygame.draw.rect(screen, (255, 0, 0), collider.transform.rect)
-
-        for enemy in self.enemies:
-            enemy.paint(screen)
+        if self.enemies is not None:
+            for enemy in self.enemies:
+                enemy.paint(screen)
 
 
         # for interactive_object in self.interactive_objects:
         #     interactive_object.paint(screen)
-        pygame.draw.rect(screen, (0, 0, 255), self.exit[0].transform.rect)
+        # pygame.draw.rect(screen, (0, 0, 255), self.exit[0].transform.rect)
         player.paint(screen)
 
     def set_exit(self, exit):
@@ -411,9 +411,9 @@ class Room:
 
     def logic(self, screen, player, keys):
         player.logic(keys)
-
-        for enemy in self.enemies:
-            enemy.logic(keys)
+        if self.enemies is not None:
+            for enemy in self.enemies:
+                enemy.logic(keys)
 
         a = [False, False, False, False]
         for collider in self.colliders:

@@ -11,7 +11,8 @@ game = True
 
 # объект игрока
 multiplier = 5
-player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(0, 0), Base.Vector2(20 * multiplier, 17 * multiplier)),
+player = Base.Player('player', None, 'player',
+                     Base.Transform(Base.Vector2(0, 0), Base.Vector2(20 * multiplier, 17 * multiplier)),
                      ['sprites/Slime/Idle/idle_0.png', 'sprites/Slime/Idle/idle_1.png', 'sprites/Slime/Idle/idle_2.png',
                       'sprites/Slime/Idle/idle_3.png', 'sprites/Slime/Idle/idle_4.png'])
 player_jump_animation = []
@@ -43,6 +44,15 @@ enemy = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(200, 500)
                    enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 488),
                    finish_vector=Base.Vector2(600, 488), enemy_animation_name='walk')
 
+enemy1 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(800, 500), Base.Vector2(70, 150)),
+                    ['sprites/solider without parasite/shooter walk/1.png',
+                     'sprites/solider without parasite/shooter walk/2.png',
+                     'sprites/solider without parasite/shooter walk/3.png',
+                     'sprites/solider without parasite/shooter walk/4.png',
+                     'sprites/solider without parasite/shooter walk/5.png'],
+                    enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(800, 488),
+                    finish_vector=Base.Vector2(1200, 488), enemy_animation_name='walk')
+
 enemy.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
 enemy.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
                             'sprites/solider without parasite/shooter die/2.png',
@@ -50,7 +60,16 @@ enemy.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png'
                             'sprites/solider without parasite/shooter die/4.png',
                             'sprites/solider without parasite/shooter die/5.png',
                             'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
-enemies = [enemy]
+
+enemy1.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
+enemy1.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
+                             'sprites/solider without parasite/shooter die/2.png',
+                             'sprites/solider without parasite/shooter die/3.png',
+                             'sprites/solider without parasite/shooter die/4.png',
+                             'sprites/solider without parasite/shooter die/5.png',
+                             'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
+
+enemies = [enemy, enemy1]
 paintable_objects = [enemy, player]
 colliders = [ceil, floor]
 # level1 = Base.Level(background, enemies, colliders)
@@ -83,7 +102,6 @@ while game:
 
 pygame.quit()
 exit()
-
 
 # while game:
 #     background.paint(screen)

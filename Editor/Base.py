@@ -357,7 +357,7 @@ class Enemy(Movable):
 
     def attack(self, player):
         for item in self.bullets:
-            if item.check_collision(player):
+            if item.check_collision(player) and player.activeSelf:
                 self.die()
 
         if not self.dead and not self.is_shooted and not self.infected:
@@ -456,7 +456,6 @@ class Level:
 
 
 class Room:
-
     def __init__(self, background, enemies=None, colliders=None, interactive_objects=None):
         self.background = background
         self.colliders = colliders
@@ -482,6 +481,13 @@ class Room:
 
         for enemy in self.enemies:
             enemy.logic(keys)
+            if enemy.infected:
+                for current_enemy in self.enemies:
+                    for item in enemy.bullets:
+                        if item.check_collision(current_enemy):
+                            if not current_enemy.infected and not current_enemy.dead:
+                                current_enemy.die()
+
             enemy.attack(player)
 
         a = [False, False, False, False]

@@ -82,11 +82,12 @@ class SpriteObject(GameObject):
                                            game_obj_tag=sprite_obj_tag, game_obj_transform=sprite_obj_transform)
 
     def paint(self, screen):
-        super(SpriteObject, self).paint()
+        if self.activeSelf:
+            super(SpriteObject, self).paint()
 
-        screen.blit(self.sprite,
-                    pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
-                                self.transform.scale.y))
+            screen.blit(self.sprite,
+                        pygame.Rect(self.transform.position.x, self.transform.position.y, self.transform.scale.x,
+                                    self.transform.scale.y))
 
 
 '''
@@ -211,8 +212,8 @@ class Movable(Animation):
 
 
 
-    def check_collision(self, rect, marked_collisions):
-        if self.transform.rect.colliderect(rect.transform.rect):
+    def process_collision(self, rect, marked_collisions):
+        if self.check_collision(rect):
 
             if abs(self.transform.rect.left - rect.transform.rect.right) <= 10:
                 marked_collisions[0] = True
@@ -228,6 +229,8 @@ class Movable(Animation):
 
         return marked_collisions
 
+    def check_collision(self, rect):
+        return self.transform.rect.colliderect(rect.transform.rect)
 
 '''
 Классы для состояний врага
@@ -285,7 +288,7 @@ class Enemy(Movable):
                     self.die()
 
             self.transform.translate(self.transform.velocity_x * k, 0)
-        else:
+        elif not self.dead:
             super().move(keys)
 
     def die(self):
@@ -297,6 +300,7 @@ class Player(Movable):
     def __init__(self, player_obj_name='Player Object', player_obj_parent=None, player_obj_tag='Player',
                  player_obj_transform=Transform(), player_image_path=None, player_obj_velocity_x=5,
                  player_obj_acceleration=1):
+        self.host = None
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
                                      movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
                                      movable_image_paths=player_image_path,
@@ -324,3 +328,72 @@ class Player(Movable):
 
         self.transform.translate(0, self.transform.velocity_y)
         self.transform.velocity_y += self.transform.acceleration
+
+    def logic(self, keys):
+        if self.host is None:
+            self.move(keys)
+
+    def take_control(self):
+        if self.host is None:
+            for enemy in Level.current_level.enemies:
+                if self.check_collision(enemy) and not enemy.dead:
+                    self.host = enemy
+                    enemy.infected = True
+                    self.activeSelf = False
+                    enemy.transform.velocity_x = self.transform.velocity_x
+        else:
+            self.activeSelf = True
+            self.host.infected = False
+            self.host.die()
+            self.transform.translate(self.host.transform.position.x - self.transform.position.x,
+                                       self.host.transform.position.y - self.transform.position.y)
+            self.host = None
+
+class Level:
+    current_level = None
+    def __init__(self, background, enemies=None, colliders=None, interactive_objects=None):
+        self.background = background
+        self.colliders = colliders
+        self.interactive_objects = interactive_objects
+
+        self.enemies = enemies
+
+    @staticmethod
+    def get_level():
+        return Level.current_level
+
+    @staticmethod
+    def set_level(level):
+        Level.current_level = level
+
+    def paint(self, player, screen):
+        self.background.paint(screen)
+
+        for enemy in self.enemies:
+            enemy.paint(screen)
+
+        # for interactive_object in self.interactive_objects:
+        #     interactive_object.paint(screen)
+
+        player.paint(screen)
+    def logic(self, screen, player, keys):
+        player.logic(keys)
+
+        for enemy in self.enemies:
+            enemy.move(keys)
+
+        a = [False, False, False, False]
+        for collider in self.colliders:
+            if player.host is None:
+                a = player.process_collision(collider, a)
+                player.collisions = a
+            else:
+                a = player.host.process_collision(collider, a)
+                player.host.collisions = a
+
+        self.paint(player, screen)
+
+
+
+
+

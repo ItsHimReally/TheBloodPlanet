@@ -312,6 +312,7 @@ class Player(Movable):
                  player_obj_transform=Transform(), player_image_path=None, player_obj_velocity_x=5,
                  player_obj_acceleration=1):
         self.host = None
+        self.ground_y = None
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
                                      movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
                                      movable_image_paths=player_image_path,
@@ -333,7 +334,6 @@ class Player(Movable):
             self.on_ground = True
             self.set_animation('idle')
             return
-
         if self.collisions[1]:
             self.transform.velocity_y = 0
 
@@ -382,8 +382,8 @@ class Level:
     def current_room(self, room):
         Level.current_room = room
 
-class Room:
 
+class Room:
     def __init__(self, background, enemies=None, colliders=None, interactive_objects=None):
         self.background = background
         self.colliders = colliders
@@ -394,6 +394,9 @@ class Room:
     def paint(self, player, screen):
         self.background.paint(screen)
 
+        for collider in self.colliders:
+            pygame.draw.rect(screen, (255, 0, 0), collider.transform.rect)
+
         for enemy in self.enemies:
             enemy.paint(screen)
 
@@ -401,6 +404,7 @@ class Room:
         #     interactive_object.paint(screen)
 
         player.paint(screen)
+
 
     def logic(self, screen, player, keys):
         player.logic(keys)

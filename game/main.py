@@ -11,7 +11,7 @@ game = True
 
 # объект игрока
 multiplier = 5
-player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(0, 0), Base.Vector2(20 * multiplier, 17 * multiplier)),
+player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(209, 170), Base.Vector2(20 * multiplier, 17 * multiplier)),
                      ['sprites/Slime/Idle/idle_0.png', 'sprites/Slime/Idle/idle_1.png', 'sprites/Slime/Idle/idle_2.png',
                       'sprites/Slime/Idle/idle_3.png', 'sprites/Slime/Idle/idle_4.png'])
 player_jump_animation = []
@@ -24,17 +24,17 @@ player.add_animation('jump', player_jump_animation, 50)
 # объект заднего фона
 multiplier = 5
 background = Base.SpriteObject('background', None, 'bg',
-                               Base.Transform(Base.Vector2(0, 0), Base.Vector2(384 * multiplier, 176 * multiplier)),
-                               'sprites/Levels/level2.png')
+                               Base.Transform(Base.Vector2(29, 100), Base.Vector2(315 * multiplier, 136 * multiplier)),
+                               'sprites/Levels/Level_0.png')
 
-ceil = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 240)),
-                         'sprites/1.png')
-floor = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 640), Base.Vector2(1600, 450)),
-                          'sprites/1.png')
-level_objects = [ceil, floor]
-
+ceil = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 170)))
+floor = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 700), Base.Vector2(1600, 450)))
+floor_vent = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(180, 257), Base.Vector2(1437, 42)))
+left_wall = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 170), Base.Vector2(82, 699)))
+right_wall = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1520, 257), Base.Vector2(81, 447)))
+box_right = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1364, 621), Base.Vector2(76, 73)))
 # создаем врага
-enemy = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500), Base.Vector2(70, 150)),
+enemy1 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500), Base.Vector2(70, 150)),
                    ['sprites/solider without parasite/shooter walk/1.png',
                     'sprites/solider without parasite/shooter walk/2.png',
                     'sprites/solider without parasite/shooter walk/3.png',
@@ -42,21 +42,20 @@ enemy = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500)
                     'sprites/solider without parasite/shooter walk/5.png'],
                    enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 488),
                    finish_vector=Base.Vector2(500, 488), enemy_animation_name='walk')
-enemy.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
-enemy.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
+enemy1.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
+enemy1.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
                             'sprites/solider without parasite/shooter die/2.png',
                             'sprites/solider without parasite/shooter die/3.png',
                             'sprites/solider without parasite/shooter die/4.png',
                             'sprites/solider without parasite/shooter die/5.png',
                             'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
-enemies = [enemy]
-paintable_objects = [enemy, player]
-colliders = [ceil, floor]
-# level1 = Base.Level(background, enemies, colliders)
-# Base.Level.set_level(level1)
-room1 = Base.Room(background, enemies, colliders)
+colliders = [floor, ceil, left_wall, right_wall, floor_vent, box_right]
+room1 = Base.Room(background, [enemy1], colliders=colliders)
+# room2 =
+# room3 =
 level1 = Base.Level([room1])
 while game:
+    screen.fill((77, 74, 92))
     background.paint(screen)
     for event in pygame.event.get():
 
@@ -67,6 +66,8 @@ while game:
             if event.key == pygame.K_e:
                 player.take_control()
 
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            print(pygame.mouse.get_pos())
 
     keys = pygame.key.get_pressed()  # клавиши, которые были нажаты
 

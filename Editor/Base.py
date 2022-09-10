@@ -293,7 +293,7 @@ class Enemy(Movable):
     def __init__(self, enemy_obj_name='Enemy Object', enemy_obj_parent=None, enemy_obj_tag='Enemy',
                  enemy_obj_transform=Transform(), enemy_image_path=None, enemy_obj_velocity_x=5, enemy_obj_velocity_y=5,
                  enemy_obj_acceleration=1, start_vector=Vector2(), finish_vector=Vector2(),
-                 enemy_animation_name='idle'):
+                 enemy_animation_name='idle', enemy_type='soldier'):
 
         self.dead = False
         self.start_pos = start_vector
@@ -302,7 +302,7 @@ class Enemy(Movable):
         self.is_shooted = False
         self.time_count = 0
         self.audio = AudioPlayer(audio_path='audio/death.wav')
-
+        self.enemy_type = enemy_type
         self.state = PatrolEnemyState(finish_vector)
         self.bullets = []
 
@@ -343,25 +343,29 @@ class Enemy(Movable):
             if keys[pygame.K_d]:
                 self.flipped = False
             if keys[pygame.K_q]:
-                if not self.is_shooted:
-                    self.bullets.append(AttackEnemyState().shoot(
-                        Vector2(self.transform.position.x + (200 * (1 if not self.flipped else -1)),
-                                (self.transform.scale.y / 2) + self.transform.position.y - 20), self))
-                    self.is_shooted = True
+                if self.enemy_type == 'soldier':
+                    if not self.is_shooted:
+                        self.bullets.append(AttackEnemyState().shoot(
+                            Vector2(self.transform.position.x + (200 * (1 if not self.flipped else -1)),
+                                    (self.transform.scale.y / 2) + self.transform.position.y - 20), self))
+                        self.is_shooted = True
 
-                else:
-                    self.time_count += 1
+                    else:
+                        self.time_count += 1
 
-                    if self.time_count >= 50:
-                        self.time_count = 0
-                        self.is_shooted = False
+                        if self.time_count >= 50:
+                            self.time_count = 0
+                            self.is_shooted = False
+                elif self.enemy_type == 'scientist':
+                    print(123)
 
             super().move(keys)
 
     def logic(self, keys):
         self.move(keys)
-        for item in self.bullets:
-            item.move()
+        if self.enemy_type == 'soldier':
+            for item in self.bullets:
+                item.move()
 
     def attack(self, player):
         for item in self.bullets:
@@ -508,8 +512,8 @@ class Room:
                             if item.check_collision(current_enemy):
                                 if not current_enemy.infected and not current_enemy.dead:
                                     current_enemy.die()
-
-                enemy.attack(player)
+                if enemy.enemy_type == 'soldier':
+                    enemy.attack(player)
 
         a = [False, False, False, False]
         for collider in self.colliders:

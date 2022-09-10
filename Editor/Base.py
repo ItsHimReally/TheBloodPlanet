@@ -117,11 +117,15 @@ class AudioPlayer(Object):
                  audio_path=''):
         self.sound = pygame.mixer.Sound(audio_path) if audio_path != '' else logging.info(
             f'Audio path has not been defined!')
+        self.sound.set_volume(0.1)
         super(AudioPlayer, self).__init__(obj_name=audio_player_name, obj_parent=audio_player_parent,
                                           obj_tag=audio_player_tag)
 
     def play(self):
         self.sound.play()
+
+    def change_volume(self, vol=0.3):
+        self.sound.set_volume(vol)
 
 
 class Animation(SpriteObject):
@@ -258,6 +262,8 @@ class AttackEnemyState:
 class Bullet(SpriteObject):
     def __init__(self, bullet_obj_parent=None, target_pos=Vector2(), x_vel=6, y_vel=0):
         self.target_vector = target_pos
+        self.audio = AudioPlayer(audio_path='audio/shoot.wav')
+        self.audio.play()
         self.velocity_x = x_vel
         self.velocity_y = y_vel
         self.time_count = 0
@@ -295,6 +301,7 @@ class Enemy(Movable):
         self.infected = False
         self.is_shooted = False
         self.time_count = 0
+        self.audio = AudioPlayer(audio_path='audio/death.wav')
 
         self.state = PatrolEnemyState(finish_vector)
         self.bullets = []
@@ -341,6 +348,7 @@ class Enemy(Movable):
                         Vector2(self.transform.position.x + (200 * (1 if not self.flipped else -1)),
                                 (self.transform.scale.y / 2) + self.transform.position.y - 20), self))
                     self.is_shooted = True
+
                 else:
                     self.time_count += 1
 
@@ -374,6 +382,7 @@ class Enemy(Movable):
     def die(self):
         self.set_animation('Die', loop=False)
         self.dead = True
+        self.audio.play()
 
 
 class Player(Movable):

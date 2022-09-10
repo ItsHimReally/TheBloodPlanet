@@ -248,18 +248,18 @@ class PatrolEnemyState:
 
 class AttackEnemyState:
     def __init__(self, player_transform=Transform(), enemy_obj=None):
-        self.shoot(player_transform.position, enemy_obj) if enemy_obj else logging.info(
-            f'Enemy_obj has not been defined!')
+        self.shoot(player_transform.position, enemy_obj, 6, 6) if enemy_obj else logging.info(f'Enemy_obj has not been defined!')
 
-    def shoot(self, end_vector=Vector2(), parent=None):
-        bullet = Bullet(parent, end_vector)
+    def shoot(self, end_vector=Vector2(), parent=None, vel_x=6, vel_y=0):
+        bullet = Bullet(parent, end_vector, vel_x, vel_y)
         return bullet
 
 
 class Bullet(SpriteObject):
-    def __init__(self, bullet_obj_parent=None, target_pos=Vector2()):
+    def __init__(self, bullet_obj_parent=None, target_pos=Vector2(), x_vel=6, y_vel=0):
         self.target_vector = target_pos
-        self.velocity = 3
+        self.velocity_x = x_vel
+        self.velocity_y = y_vel
         self.time_count = 0
         self.dir = -1 if bullet_obj_parent.flipped else 1
         img_path = 'sprites/bullet.png'
@@ -275,7 +275,7 @@ class Bullet(SpriteObject):
         if self.time_count >= 200:
             self.activeSelf = False
 
-        self.transform.translate(self.velocity * self.dir, 0)
+        self.transform.translate(self.velocity_x * self.dir, self.velocity_y * self.dir)
 
 
 '''
@@ -345,7 +345,7 @@ class Enemy(Movable):
                 else:
                     self.time_count += 1
 
-                    if self.time_count >= 20:
+                    if self.time_count >= 50:
                         self.time_count = 0
                         self.is_shooted = False
 
@@ -355,6 +355,18 @@ class Enemy(Movable):
         self.move(keys)
         for item in self.bullets:
             item.move()
+
+    def attack(self, player):
+        if not self.dead and not self.is_shooted and not self.infected:
+            self.bullets.append(AttackEnemyState().shoot(player.transform.position, self, 6, -3 * (-1 if not self.flipped else 1)))
+            self.is_shooted = True
+
+        elif not self.dead and self.is_shooted and not self.infected:
+            self.time_count += 1
+
+            if self.time_count >= 50:
+                self.time_count = 0
+                self.is_shooted = False
 
     def die(self):
         self.set_animation('Die', loop=False)
@@ -417,10 +429,12 @@ class Player(Movable):
 
 class Level:
     current_level = None
+
     def __init__(self, rooms):
         self.rooms = rooms
         Level.current_level = self
         self.current_room = rooms[0]
+
     @staticmethod
     def get_level():
         return Level.current_level
@@ -464,6 +478,7 @@ class Room:
 
         for enemy in self.enemies:
             enemy.logic(keys)
+            enemy.attack(player)
 
         a = [False, False, False, False]
         for collider in self.colliders:

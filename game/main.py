@@ -34,14 +34,15 @@ floor = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(
 level_objects = [ceil, floor]
 
 # создаем врага
-enemy = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500), Base.Vector2(70, 150)),
+enemy = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(200, 500), Base.Vector2(70, 150)),
                    ['sprites/solider without parasite/shooter walk/1.png',
                     'sprites/solider without parasite/shooter walk/2.png',
                     'sprites/solider without parasite/shooter walk/3.png',
                     'sprites/solider without parasite/shooter walk/4.png',
                     'sprites/solider without parasite/shooter walk/5.png'],
                    enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 488),
-                   finish_vector=Base.Vector2(500, 488), enemy_animation_name='walk')
+                   finish_vector=Base.Vector2(600, 488), enemy_animation_name='walk')
+
 enemy.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
 enemy.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
                             'sprites/solider without parasite/shooter die/2.png',

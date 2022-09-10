@@ -346,7 +346,7 @@ class Player(Movable):
 
     def take_control(self):
         if self.host is None:
-            for enemy in Level.current_level.enemies:
+            for enemy in Level.get_level().current_room.enemies:
                 if self.check_collision(enemy) and not enemy.dead:
                     self.host = enemy
                     enemy.infected = True
@@ -362,20 +362,34 @@ class Player(Movable):
 
 class Level:
     current_level = None
+    def __init__(self, rooms):
+        self.rooms = rooms
+        Level.current_level = self
+        self.current_room = rooms[0]
+    @staticmethod
+    def get_level():
+        return Level.current_level
+
+    @staticmethod
+    def set_level(self, level):
+        Level.current_level = level
+
+    @property
+    def current_room(self):
+        return Level.current_room
+
+    @current_room.setter
+    def current_room(self, room):
+        Level.current_room = room
+
+class Room:
+
     def __init__(self, background, enemies=None, colliders=None, interactive_objects=None):
         self.background = background
         self.colliders = colliders
         self.interactive_objects = interactive_objects
 
         self.enemies = enemies
-
-    @staticmethod
-    def get_level():
-        return Level.current_level
-
-    @staticmethod
-    def set_level(level):
-        Level.current_level = level
 
     def paint(self, player, screen):
         self.background.paint(screen)
@@ -387,6 +401,7 @@ class Level:
         #     interactive_object.paint(screen)
 
         player.paint(screen)
+
     def logic(self, screen, player, keys):
         player.logic(keys)
 
@@ -403,8 +418,5 @@ class Level:
                 player.host.collisions = a
 
         self.paint(player, screen)
-
-
-
 
 

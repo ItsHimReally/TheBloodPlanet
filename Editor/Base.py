@@ -412,7 +412,6 @@ class Player(Movable):
             self.on_ground = True
             self.set_animation('idle')
             return
-
         if self.collisions[1]:
             self.transform.velocity_y = 0
 
@@ -468,25 +467,33 @@ class Level:
 
 
 class Room:
+
     def __init__(self, background, enemies=None, colliders=None, interactive_objects=None):
         self.background = background
         self.colliders = colliders
         self.interactive_objects = interactive_objects
-
+        self.exit = None
         self.enemies = enemies
 
     def paint(self, player, screen):
         self.background.paint(screen)
+
+        # for collider in self.colliders:
+        #     pygame.draw.rect(screen, (255, 0, 0), collider.transform.rect)
 
         for enemy in self.enemies:
             enemy.paint(screen)
             for item in enemy.bullets:
                 item.paint(screen)
 
+
         # for interactive_object in self.interactive_objects:
         #     interactive_object.paint(screen)
-
+        pygame.draw.rect(screen, (0, 0, 255), self.exit[0].transform.rect)
         player.paint(screen)
+
+    def set_exit(self, exit):
+        self.exit = exit
 
     def logic(self, screen, player, keys):
         player.logic(keys)
@@ -510,5 +517,15 @@ class Room:
             else:
                 a = player.host.process_collision(collider, a)
                 player.host.collisions = a
+
+        if player.check_collision(self.exit[0]):
+            # print(1)
+            Level.get_level().current_room = self.exit[1]
+            player.transform.translate(self.exit[2][0] - player.transform.position.x,
+                                       self.exit[2][1] - player.transform.position.y)
+            # print(self.exit[1])
+            # print(Level.get_level().current_room)
+            return
+
 
         self.paint(player, screen)

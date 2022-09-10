@@ -10,7 +10,8 @@ pygame.display.set_caption('')
 game = True
 
 # объект игрока
-player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(0, 0), Base.Vector2(100, 85)),
+multiplier = 5
+player = Base.Player('player', None, 'player', Base.Transform(Base.Vector2(0, 0), Base.Vector2(20 * multiplier, 17 * multiplier)),
                      ['sprites/Slime/Idle/idle_0.png', 'sprites/Slime/Idle/idle_1.png', 'sprites/Slime/Idle/idle_2.png',
                       'sprites/Slime/Idle/idle_3.png', 'sprites/Slime/Idle/idle_4.png'])
 player_jump_animation = []
@@ -40,8 +41,8 @@ enemy = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500)
                     'sprites/solider without parasite/shooter walk/4.png',
                     'sprites/solider without parasite/shooter walk/5.png'],
                    enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 488),
-                   finish_vector=Base.Vector2(500, 488))
-
+                   finish_vector=Base.Vector2(500, 488), enemy_animation_name='walk')
+enemy.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
 enemy.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
                             'sprites/solider without parasite/shooter die/2.png',
                             'sprites/solider without parasite/shooter die/3.png',
@@ -75,7 +76,7 @@ while game:
     clock.tick(60)
     if keys[pygame.K_ESCAPE]:
         pygame.quit()
-        pygame.exit()
+        exit()
         break
 
 pygame.quit()

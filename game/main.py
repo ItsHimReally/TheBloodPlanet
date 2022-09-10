@@ -35,7 +35,7 @@ background1 = Base.SpriteObject('background', None, 'bg',
 # box_right = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1364, 620), Base.Vector2(85, 81)))
 # capsule_right = Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(1444, 539), Base.Vector2(77, 159)))
 # создаем врага
-enemy = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(200, 500), Base.Vector2(70, 150)),
+
 enemy1 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500), Base.Vector2(70, 150)),
                    ['sprites/solider without parasite/shooter walk/1.png',
                     'sprites/solider without parasite/shooter walk/2.png',
@@ -44,6 +44,7 @@ enemy1 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(500, 500
                     'sprites/solider without parasite/shooter walk/5.png'],
                    enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 225),
                    finish_vector=Base.Vector2(500, 488), enemy_animation_name='walk')
+
 enemy1.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
 enemy1.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
                             'sprites/solider without parasite/shooter die/2.png',
@@ -102,10 +103,6 @@ enemy1 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(800, 500
                     enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(800, 488),
                     finish_vector=Base.Vector2(1200, 488), enemy_animation_name='walk')
 
-enemy.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
-enemy.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
-                   enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(300, 225),
-                   finish_vector=Base.Vector2(500, 488), enemy_animation_name='walk')
 enemy2.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
 enemy2.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png',
                             'sprites/solider without parasite/shooter die/2.png',
@@ -186,12 +183,8 @@ enemy1.add_animation('Die', ['sprites/solider without parasite/shooter die/1.png
                              'sprites/solider without parasite/shooter die/5.png',
                              'sprites/solider without parasite/shooter die/6.png'], animation_delay=100, x_scale=200)
 
-enemies = [enemy, enemy1]
-paintable_objects = [enemy, player]
-colliders = [ceil, floor]
 # level1 = Base.Level(background, enemies, colliders)
 # Base.Level.set_level(level1)
-room1 = Base.Room(background, enemies, colliders)
 level1 = Base.Level([room1])
 while game:
     screen.fill((77, 74, 92))

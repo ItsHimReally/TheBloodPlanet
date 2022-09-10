@@ -31,6 +31,7 @@ class Transform:
         self.acceleration = 0
         self.rect = pygame.Rect(self.position.x, self.position.y, self.scale.x,
                                 self.scale.y)
+
     '''
     Метод перемещения объекта
     
@@ -152,9 +153,11 @@ class Animation(SpriteObject):
         if current_time - self.last_frame_time >= self.animation_delay:
             self.last_frame_time = current_time
             if self.loop:
-                self.current_frame = self.current_frame + 1 if self.current_frame < len(self.current_animation) - 1 else 0
+                self.current_frame = self.current_frame + 1 if self.current_frame < len(
+                    self.current_animation) - 1 else 0
             else:
-                self.current_frame = self.current_frame + 1 if self.current_frame < len(self.current_animation) - 1 else len(self.current_animation) - 1
+                self.current_frame = self.current_frame + 1 if self.current_frame < len(
+                    self.current_animation) - 1 else len(self.current_animation) - 1
 
         super(Animation, self).paint(screen)
 
@@ -232,6 +235,7 @@ class Movable(Animation):
     def check_collision(self, rect):
         return self.transform.rect.colliderect(rect.transform.rect)
 
+
 '''
 Классы для состояний врага
 '''
@@ -243,8 +247,35 @@ class PatrolEnemyState:
 
 
 class AttackEnemyState:
-    def __init__(self, player_transform=Transform()):
-        pass
+    def __init__(self, player_transform=Transform(), enemy_obj=None):
+        self.shoot(player_transform.position, enemy_obj) if enemy_obj else logging.info(
+            f'Enemy_obj has not been defined!')
+
+    def shoot(self, end_vector=Vector2(), parent=None):
+        bullet = Bullet(parent, end_vector)
+        return bullet
+
+
+class Bullet(SpriteObject):
+    def __init__(self, bullet_obj_parent=None, target_pos=Vector2()):
+        self.target_vector = target_pos
+        self.velocity = 3
+        self.time_count = 0
+        self.dir = -1 if bullet_obj_parent.flipped else 1
+        img_path = 'sprites/bullet.png'
+        super(Bullet, self).__init__(sprite_obj_name='Bullet', sprite_obj_parent=bullet_obj_parent,
+                                     sprite_obj_tag='Bullet', sprite_obj_transform=Transform(Vector2(
+                bullet_obj_parent.transform.position.x + (bullet_obj_parent.transform.scale.x - 5 if self.dir == 1 else -15),
+                bullet_obj_parent.transform.position.y + (bullet_obj_parent.transform.scale.y / 2) - 20),
+                                                                                             Vector2(20, 10)),
+                                     image_path=img_path)
+
+    def move(self):
+        self.time_count += 1
+        if self.time_count >= 200:
+            self.activeSelf = False
+
+        self.transform.translate(self.velocity * self.dir, 0)
 
 
 '''
@@ -255,14 +286,18 @@ class AttackEnemyState:
 class Enemy(Movable):
     def __init__(self, enemy_obj_name='Enemy Object', enemy_obj_parent=None, enemy_obj_tag='Enemy',
                  enemy_obj_transform=Transform(), enemy_image_path=None, enemy_obj_velocity_x=5, enemy_obj_velocity_y=5,
-                 enemy_obj_acceleration=1, start_vector=Vector2(), finish_vector=Vector2(), enemy_animation_name='idle'):
+                 enemy_obj_acceleration=1, start_vector=Vector2(), finish_vector=Vector2(),
+                 enemy_animation_name='idle'):
 
         self.dead = False
         self.start_pos = start_vector
         self.finish_pos = finish_vector
         self.infected = False
+        self.is_shooted = False
+        self.time_count = 0
 
         self.state = PatrolEnemyState(finish_vector)
+        self.bullets = []
 
         transform = Transform(Vector2(start_vector.x, start_vector.y), enemy_obj_transform.scale)
 
@@ -270,10 +305,13 @@ class Enemy(Movable):
                                     movable_obj_tag=enemy_obj_tag, movable_obj_transform=transform,
                                     movable_image_paths=enemy_image_path, movable_obj_velocity_x=enemy_obj_velocity_x,
                                     movable_obj_velocity_y=enemy_obj_velocity_y,
-                                    movable_obj_acceleration=enemy_obj_acceleration, movable_animation_name=enemy_animation_name)
+                                    movable_obj_acceleration=enemy_obj_acceleration,
+                                    movable_animation_name=enemy_animation_name)
 
     def move(self, keys):
+
         if not self.dead and not self.infected:
+
             k = 1 if ((self.transform.position.x - self.state.next_position.x) * -1) >= 0 else -1
 
             if k == 1:
@@ -285,9 +323,9 @@ class Enemy(Movable):
                 if self.transform.position.x - self.transform.velocity_x <= self.state.next_position.x:
                     self.state = PatrolEnemyState(self.finish_pos)
                     self.flipped = False
-                    self.die()
 
             self.transform.translate(self.transform.velocity_x * k, 0)
+
         elif not self.dead:
             if not keys[pygame.K_a] and not keys[pygame.K_d]:
                 self.set_animation('idle')
@@ -297,10 +335,26 @@ class Enemy(Movable):
                 self.flipped = True
             if keys[pygame.K_d]:
                 self.flipped = False
+            if keys[pygame.K_q]:
+                if not self.is_shooted:
+                    self.bullets.append(AttackEnemyState().shoot(
+                        Vector2(self.transform.position.x + (200 * (1 if not self.flipped else -1)),
+                                (self.transform.scale.y / 2) + self.transform.position.y - 20), self))
+                    self.is_shooted = True
+
+                else:
+                    self.time_count += 1
+
+                    if self.time_count >= 20:
+                        self.time_count = 0
+                        self.is_shooted = False
+
             super().move(keys)
 
     def logic(self, keys):
         self.move(keys)
+        for item in self.bullets:
+            item.move()
 
     def die(self):
         self.set_animation('Die', loop=False)
@@ -357,11 +411,13 @@ class Player(Movable):
             self.host.infected = False
             self.host.die()
             self.transform.translate(self.host.transform.position.x - self.transform.position.x,
-                                       self.host.transform.position.y - self.transform.position.y)
+                                     self.host.transform.position.y - self.transform.position.y)
             self.host = None
+
 
 class Level:
     current_level = None
+
     def __init__(self, background, enemies=None, colliders=None, interactive_objects=None):
         self.background = background
         self.colliders = colliders
@@ -382,11 +438,14 @@ class Level:
 
         for enemy in self.enemies:
             enemy.paint(screen)
+            for item in enemy.bullets:
+                item.paint(screen)
 
         # for interactive_object in self.interactive_objects:
         #     interactive_object.paint(screen)
 
         player.paint(screen)
+
     def logic(self, screen, player, keys):
         player.logic(keys)
 
@@ -403,8 +462,3 @@ class Level:
                 player.host.collisions = a
 
         self.paint(player, screen)
-
-
-
-
-

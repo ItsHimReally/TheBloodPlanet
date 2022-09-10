@@ -65,7 +65,6 @@ while game:
             if event.key == pygame.K_e:
                 player.take_control()
 
-
     keys = pygame.key.get_pressed()  # клавиши, которые были нажаты
 
     # реакции на нажатия клавиш

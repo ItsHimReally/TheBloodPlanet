@@ -199,16 +199,20 @@ b = 0
 pygame.font.init()
 my_font = pygame.font.SysFont('Comic Sans MS', 30)
 
-text_surface = my_font.render('You are a loh', False, (0, 0, 0))
+text_surface = my_font.render('Try better lol :>', False, (0, 0, 0))
+text_surface_1 = my_font.render('as a punishment, disable the game from the task manager and start it again :_)', False, (0, 0, 0))
+text_surface_2 = my_font.render('press E to move into the NPC', False, (0, 0, 0))
 
 while game:
     screen.fill((77, 74, 92))
 
     if not player.is_alive:
-        screen.blit(text_surface, (600, 400))
+        screen.blit(text_surface, (700, 400))
+        screen.blit(text_surface_1, (300, 600))
         pygame.display.update()
-        clock.tick(200)
-        continue
+        pygame.time.delay(2000000)
+        break
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -227,6 +231,7 @@ while game:
     # реакции на нажатия клавиш
 
     Base.Level.get_level().current_room.logic(screen, player, keys)
+    screen.blit(text_surface_2, (1100, 820))
 
     pygame.display.update()
     clock.tick(60)

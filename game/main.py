@@ -196,10 +196,21 @@ level1.current_room = room1
 a = 0
 b = 0
 
+pygame.font.init()
+my_font = pygame.font.SysFont('Comic Sans MS', 30)
+
+text_surface = my_font.render('You are a loh', False, (0, 0, 0))
+
 while game:
     screen.fill((77, 74, 92))
-    for event in pygame.event.get():
 
+    if not player.is_alive:
+        screen.blit(text_surface, (600, 400))
+        pygame.display.update()
+        clock.tick(200)
+        continue
+
+    for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game = False
 

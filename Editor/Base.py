@@ -372,7 +372,7 @@ class Enemy(Movable):
     def attack(self, player):
         for item in self.bullets:
             if item.check_collision(player) and player.activeSelf:
-                self.die()
+                player.is_alive = False
 
         if not self.dead and not self.is_shooted and not self.infected:
             self.bullets.append(
@@ -400,6 +400,7 @@ class Player(Movable):
         self.host = None
         self.sound = AudioPlayer(audio_path='audio/take_control.wav')
         self.ground_y = None
+        self.is_alive = True
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
                                      movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
                                      movable_image_paths=player_image_path,

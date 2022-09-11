@@ -16,6 +16,7 @@ You are a government-bred parasitic organism on Mars with a unique ability to in
 * A, D - move the character
 * W - jump
 * E - use character
+* Q - shoot
 
 
 _All code, all character models, levels, music and sounds are made by True Expanded Legendary Great Madmen._

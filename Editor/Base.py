@@ -208,35 +208,50 @@ class Movable(Animation):
 
     def move(self, keys):
         # move left check collision
-        if keys[pygame.K_a] and not self.collisions[0]:
+        if keys[pygame.K_a]:
             self.transform.translate(-1 * self.transform.velocity_x, 0)
 
         # move right check collision
-        if keys[pygame.K_d] and not self.collisions[2]:
+        if keys[pygame.K_d]:
             self.transform.translate(self.transform.velocity_x, 0)
 
         if keys[pygame.K_r]:
             self.transform.translate(0, -100)
 
         # fall check collision
-        if not self.collisions[3] and self.on_ground:
+        if not self.collisions[3]:
             self.transform.translate(0, 10)
 
     def process_collision(self, rect, marked_collisions):
         if self.check_collision(rect):
 
+            # if abs(self.transform.rect.left - rect.transform.rect.right) <= 10:
+            #     marked_collisions[0] = True
+            #
+            # if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 10:
+            #     marked_collisions[1] = True
+            #
+            # if abs(self.transform.rect.right - rect.transform.rect.left) <= 10:
+            #     marked_collisions[2] = True
+            #
+            # if abs(self.transform.rect.bottom - rect.transform.rect.top) <= 10:
+            #     marked_collisions[3] = True
+
             if abs(self.transform.rect.left - rect.transform.rect.right) <= 10:
+                self.transform.translate(-1 * (self.transform.rect.left - rect.transform.rect.right), 0)
                 marked_collisions[0] = True
 
-            if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 10:
-                marked_collisions[1] = True
+            if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 50:
+                self.transform.translate(0, -1 * (self.transform.rect.top - rect.transform.rect.bottom))
+                marked_collisions[0] = True
 
             if abs(self.transform.rect.right - rect.transform.rect.left) <= 10:
-                marked_collisions[2] = True
+                self.transform.translate(-1 * (self.transform.rect.right - rect.transform.rect.left), 0)
+                marked_collisions[0] = True
 
             if abs(self.transform.rect.bottom - rect.transform.rect.top) <= 10:
-                marked_collisions[3] = True
-
+                self.transform.translate(0, -1 * (self.transform.rect.bottom - rect.transform.rect.top))
+                marked_collisions[0] = True
         return marked_collisions
 
 
@@ -252,7 +267,8 @@ class PatrolEnemyState:
 
 class AttackEnemyState:
     def __init__(self, player_transform=Transform(), enemy_obj=None):
-        self.shoot(player_transform.position, enemy_obj, 6, 6) if enemy_obj else logging.info(f'Enemy_obj has not been defined!')
+        self.shoot(player_transform.position, enemy_obj, 6, 6) if enemy_obj else logging.info(
+            f'Enemy_obj has not been defined!')
 
     def shoot(self, end_vector=Vector2(), parent=None, vel_x=6, vel_y=0):
         bullet = Bullet(parent, end_vector, vel_x, vel_y)
@@ -271,9 +287,10 @@ class Bullet(SpriteObject):
         img_path = 'sprites/bullet.png'
         super(Bullet, self).__init__(sprite_obj_name='Bullet', sprite_obj_parent=bullet_obj_parent,
                                      sprite_obj_tag='Bullet', sprite_obj_transform=Transform(Vector2(
-                bullet_obj_parent.transform.position.x + (bullet_obj_parent.transform.scale.x - 5 if self.dir == 1 else -15),
+                bullet_obj_parent.transform.position.x + (
+                    bullet_obj_parent.transform.scale.x - 5 if self.dir == 1 else -15),
                 bullet_obj_parent.transform.position.y + (bullet_obj_parent.transform.scale.y / 2) - 20),
-                                                                                             Vector2(20, 10)),
+                Vector2(20, 10)),
                                      image_path=img_path)
 
     def move(self):
@@ -293,7 +310,7 @@ class Enemy(Movable):
     def __init__(self, enemy_obj_name='Enemy Object', enemy_obj_parent=None, enemy_obj_tag='Enemy',
                  enemy_obj_transform=Transform(), enemy_image_path=None, enemy_obj_velocity_x=5, enemy_obj_velocity_y=5,
                  enemy_obj_acceleration=1, start_vector=Vector2(), finish_vector=Vector2(),
-                 enemy_animation_name='idle'):
+                 enemy_animation_name='idle', enemy_type='soldier'):
 
         self.dead = False
         self.start_pos = start_vector
@@ -302,7 +319,7 @@ class Enemy(Movable):
         self.is_shooted = False
         self.time_count = 0
         self.audio = AudioPlayer(audio_path='audio/death.wav')
-
+        self.enemy_type = enemy_type
         self.state = PatrolEnemyState(finish_vector)
         self.bullets = []
 
@@ -339,37 +356,42 @@ class Enemy(Movable):
             elif self.current_animation_name != 'walk':
                 self.set_animation('walk')
             if keys[pygame.K_a]:
-                self.flipped = True
+                self.flipped = True if self.enemy_type == 'soldier' else False
             if keys[pygame.K_d]:
-                self.flipped = False
+                self.flipped = False if self.enemy_type == 'soldier' else True
             if keys[pygame.K_q]:
-                if not self.is_shooted:
-                    self.bullets.append(AttackEnemyState().shoot(
-                        Vector2(self.transform.position.x + (200 * (1 if not self.flipped else -1)),
-                                (self.transform.scale.y / 2) + self.transform.position.y - 20), self))
-                    self.is_shooted = True
+                if self.enemy_type == 'soldier':
+                    if not self.is_shooted:
+                        self.bullets.append(AttackEnemyState().shoot(
+                            Vector2(self.transform.position.x + (200 * (1 if not self.flipped else -1)),
+                                    (self.transform.scale.y / 2) + self.transform.position.y - 20), self))
+                        self.is_shooted = True
 
-                else:
-                    self.time_count += 1
+                    else:
+                        self.time_count += 1
 
-                    if self.time_count >= 50:
-                        self.time_count = 0
-                        self.is_shooted = False
+                        if self.time_count >= 50:
+                            self.time_count = 0
+                            self.is_shooted = False
+                elif self.enemy_type == 'scientist':
+                    print(123)
 
             super().move(keys)
 
     def logic(self, keys):
         self.move(keys)
-        for item in self.bullets:
-            item.move()
+        if self.enemy_type == 'soldier':
+            for item in self.bullets:
+                item.move()
 
     def attack(self, player):
         for item in self.bullets:
             if item.check_collision(player) and player.activeSelf:
-                self.die()
+                player.is_alive = False
 
         if not self.dead and not self.is_shooted and not self.infected:
-            self.bullets.append(AttackEnemyState().shoot(player.transform.position, self, 6, -3 * (-1 if not self.flipped else 1)))
+            self.bullets.append(
+                AttackEnemyState().shoot(player.transform.position, self, 6, -3 * (-1 if not self.flipped else 1)))
             self.is_shooted = True
 
         elif not self.dead and self.is_shooted and not self.infected:
@@ -380,9 +402,10 @@ class Enemy(Movable):
                 self.is_shooted = False
 
     def die(self):
-        self.set_animation('Die', loop=False)
-        self.dead = True
-        self.audio.play()
+        if not self.dead:
+            self.set_animation('Die', loop=False)
+            self.dead = True
+            self.audio.play()
 
 
 class Player(Movable):
@@ -392,6 +415,8 @@ class Player(Movable):
         self.host = None
         self.sound = AudioPlayer(audio_path='audio/take_control.wav')
         self.ground_y = None
+        self.jumping = False
+        self.is_alive = True
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
                                      movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
                                      movable_image_paths=player_image_path,
@@ -399,22 +424,19 @@ class Player(Movable):
                                      movable_obj_acceleration=player_obj_acceleration)
 
     def move(self, keys):
-        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.collisions[3] and not self.collisions[1]:
-            self.on_ground = False
-            self.transform.velocity_y = -20
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and not self.jumping:
+            self.jumping = True
+            self.transform.velocity_y = -30
             self.set_animation('jump')
         super().move(keys)
-        if not self.on_ground:
+        if self.jumping:
             self.jump()
 
     def jump(self):
-        if self.transform.velocity_y >= 21:
+        if self.transform.velocity_y >= 0:
             self.transform.velocity_y = 0
-            self.on_ground = True
             self.set_animation('idle')
             return
-        if self.collisions[1]:
-            self.transform.velocity_y = 0
 
         self.transform.translate(0, self.transform.velocity_y)
         self.transform.velocity_y += self.transform.acceleration
@@ -422,16 +444,19 @@ class Player(Movable):
     def logic(self, keys):
         if self.host is None:
             self.move(keys)
+            if not self.jumping and self.current_animation_name == 'jump':
+                self.set_animation('idle')
 
     def take_control(self):
         if self.host is None:
-            for enemy in Level.get_level().current_room.enemies:
-                if self.check_collision(enemy) and not enemy.dead:
-                    self.sound.play()
-                    self.host = enemy
-                    enemy.infected = True
-                    self.activeSelf = False
-                    enemy.transform.velocity_x = self.transform.velocity_x
+            if Level.get_level().current_room.enemies is not None:
+                for enemy in Level.get_level().current_room.enemies:
+                    if self.check_collision(enemy) and not enemy.dead:
+                        self.sound.play()
+                        self.host = enemy
+                        enemy.infected = True
+                        self.activeSelf = False
+                        enemy.transform.velocity_x = self.transform.velocity_x
         else:
             self.sound.play()
             self.activeSelf = True
@@ -487,7 +512,6 @@ class Room:
                 for item in enemy.bullets:
                     item.paint(screen)
 
-
         # for interactive_object in self.interactive_objects:
         #     interactive_object.paint(screen)
         # pygame.draw.rect(screen, (0, 0, 255), self.exit[0].transform.rect)
@@ -508,12 +532,14 @@ class Room:
                             if item.check_collision(current_enemy):
                                 if not current_enemy.infected and not current_enemy.dead:
                                     current_enemy.die()
-
-                enemy.attack(player)
+                if enemy.enemy_type == 'soldier':
+                    enemy.attack(player)
 
         a = [False, False, False, False]
         for collider in self.colliders:
             if player.host is None:
+                if player.jumping and player.check_collision(collider) and abs(player.transform.rect.bottom - collider.transform.rect.top) <= 10:
+                    player.jumping = False
                 a = player.process_collision(collider, a)
                 player.collisions = a
             else:
@@ -528,6 +554,5 @@ class Room:
             # print(self.exit[1])
             # print(Level.get_level().current_room)
             return
-
 
         self.paint(player, screen)

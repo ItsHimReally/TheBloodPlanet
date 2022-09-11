@@ -252,7 +252,8 @@ class PatrolEnemyState:
 
 class AttackEnemyState:
     def __init__(self, player_transform=Transform(), enemy_obj=None):
-        self.shoot(player_transform.position, enemy_obj, 6, 6) if enemy_obj else logging.info(f'Enemy_obj has not been defined!')
+        self.shoot(player_transform.position, enemy_obj, 6, 6) if enemy_obj else logging.info(
+            f'Enemy_obj has not been defined!')
 
     def shoot(self, end_vector=Vector2(), parent=None, vel_x=6, vel_y=0):
         bullet = Bullet(parent, end_vector, vel_x, vel_y)
@@ -271,9 +272,10 @@ class Bullet(SpriteObject):
         img_path = 'sprites/bullet.png'
         super(Bullet, self).__init__(sprite_obj_name='Bullet', sprite_obj_parent=bullet_obj_parent,
                                      sprite_obj_tag='Bullet', sprite_obj_transform=Transform(Vector2(
-                bullet_obj_parent.transform.position.x + (bullet_obj_parent.transform.scale.x - 5 if self.dir == 1 else -15),
+                bullet_obj_parent.transform.position.x + (
+                    bullet_obj_parent.transform.scale.x - 5 if self.dir == 1 else -15),
                 bullet_obj_parent.transform.position.y + (bullet_obj_parent.transform.scale.y / 2) - 20),
-                                                                                             Vector2(20, 10)),
+                Vector2(20, 10)),
                                      image_path=img_path)
 
     def move(self):
@@ -339,9 +341,9 @@ class Enemy(Movable):
             elif self.current_animation_name != 'walk':
                 self.set_animation('walk')
             if keys[pygame.K_a]:
-                self.flipped = True
+                self.flipped = True if self.enemy_type == 'soldier' else False
             if keys[pygame.K_d]:
-                self.flipped = False
+                self.flipped = False if self.enemy_type == 'soldier' else True
             if keys[pygame.K_q]:
                 if self.enemy_type == 'soldier':
                     if not self.is_shooted:
@@ -373,7 +375,8 @@ class Enemy(Movable):
                 self.die()
 
         if not self.dead and not self.is_shooted and not self.infected:
-            self.bullets.append(AttackEnemyState().shoot(player.transform.position, self, 6, -3 * (-1 if not self.flipped else 1)))
+            self.bullets.append(
+                AttackEnemyState().shoot(player.transform.position, self, 6, -3 * (-1 if not self.flipped else 1)))
             self.is_shooted = True
 
         elif not self.dead and self.is_shooted and not self.infected:
@@ -384,9 +387,10 @@ class Enemy(Movable):
                 self.is_shooted = False
 
     def die(self):
-        self.set_animation('Die', loop=False)
-        self.dead = True
-        self.audio.play()
+        if not self.dead:
+            self.set_animation('Die', loop=False)
+            self.dead = True
+            self.audio.play()
 
 
 class Player(Movable):
@@ -491,7 +495,6 @@ class Room:
                 enemy.paint(screen)
                 for item in enemy.bullets:
                     item.paint(screen)
-
 
         # for interactive_object in self.interactive_objects:
         #     interactive_object.paint(screen)

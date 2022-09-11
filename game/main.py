@@ -62,9 +62,9 @@ background1 = Base.SpriteObject('background', None, 'bg',
                                 Base.Transform(Base.Vector2(29, 100), Base.Vector2(315 * multiplier, 136 * multiplier)),
                                 'sprites/Levels/Level_0.png')
 
-pygame.mixer.music.load('audio/elementals.mp3')
+pygame.mixer.music.load('audio/back.mp3')
 pygame.mixer.music.play()
-pygame.mixer.music.set_volume(0.07)
+pygame.mixer.music.set_volume(0.2)
 
 colliders1 = [
     Base.SpriteObject('testObject', None, 'to', Base.Transform(Base.Vector2(0, 0), Base.Vector2(1600, 170))),
@@ -158,8 +158,8 @@ enemy3_1 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(800, 2
 
 enemy3_2 = Base.Enemy('Enemy', None, 'Enemy', Base.Transform(Base.Vector2(800, 640), Base.Vector2(70, 150)),
                       soilder_anim_walk,
-                      enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(700, 640),
-                      finish_vector=Base.Vector2(1000, 640), enemy_animation_name='walk')
+                      enemy_obj_velocity_x=2, enemy_obj_velocity_y=0, start_vector=Base.Vector2(700, 620),
+                      finish_vector=Base.Vector2(1000, 620), enemy_animation_name='walk')
 
 enemy3_1.add_animation('idle', ['sprites/solider without parasite/sidle.png'], 150, False)
 enemy3_1.add_animation('Die', soilder_anim_die, animation_delay=100, x_scale=200)
@@ -202,13 +202,20 @@ my_font = pygame.font.SysFont('Comic Sans MS', 30)
 text_surface = my_font.render('Try better lol :>', False, (0, 0, 0))
 text_surface_1 = my_font.render('as a punishment, disable the game from the task manager and start it again :_)', False, (0, 0, 0))
 text_surface_2 = my_font.render('press E to move into the NPC', False, (0, 0, 0))
+text_surface_3 = my_font.render('press Q to shoot', False, (0, 0, 0))
 
 while game:
     screen.fill((77, 74, 92))
 
     if not player.is_alive:
+
         screen.blit(text_surface, (700, 400))
         screen.blit(text_surface_1, (300, 600))
+
+        pygame.mixer.music.load('audio/LongEdit.mp3')
+        pygame.mixer.music.play()
+        pygame.mixer.music.set_volume(0.07)
+
         pygame.display.update()
         pygame.time.delay(2000000)
         break
@@ -232,6 +239,8 @@ while game:
 
     Base.Level.get_level().current_room.logic(screen, player, keys)
     screen.blit(text_surface_2, (1100, 820))
+    if player.host is not None and player.host.enemy_type == "soldier":
+        screen.blit(text_surface_3, (1100, 790))
 
     pygame.display.update()
     clock.tick(60)

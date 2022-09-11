@@ -181,7 +181,7 @@ room3.set_exit(exit3)
 room4.set_exit(exit1)
 
 level1 = Base.Level([room1, room2, room3])
-level1.current_room = room3
+level1.current_room = room1
 # room2 =
 # room3 =
 
@@ -213,7 +213,6 @@ while game:
             a = pygame.mouse.get_pos()[0] - a
             b = pygame.mouse.get_pos()[1] - b
             print(f'({a}, {b})')
-
     keys = pygame.key.get_pressed()  # клавиши, которые были нажаты
 
     # реакции на нажатия клавиш

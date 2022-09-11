@@ -3,9 +3,7 @@
 A PyWeek 34 (September 2022) Entry by True Expanded Legendary Great Madmen.
 
 ## Running
-* 1
-* 2
-* 3
+* Откройте файл `game/run_game.py` для запуска игры.
 
 ### Requires
 * pygame

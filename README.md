@@ -1,3 +1,4 @@
+![resized](https://user-images.githubusercontent.com/92299342/189548156-adfc2995-5a39-48a7-bb30-864a9baaf827.png)
 # The Blood Planet — Action game with deep meaning
 A PyWeek 34 (September 2022) Entry by True Expanded Legendary Great Madmen.
 

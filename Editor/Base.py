@@ -208,35 +208,50 @@ class Movable(Animation):
 
     def move(self, keys):
         # move left check collision
-        if keys[pygame.K_a] and not self.collisions[0]:
+        if keys[pygame.K_a]:
             self.transform.translate(-1 * self.transform.velocity_x, 0)
 
         # move right check collision
-        if keys[pygame.K_d] and not self.collisions[2]:
+        if keys[pygame.K_d]:
             self.transform.translate(self.transform.velocity_x, 0)
 
         if keys[pygame.K_r]:
             self.transform.translate(0, -100)
 
         # fall check collision
-        if not self.collisions[3] and self.on_ground:
+        if not self.collisions[3]:
             self.transform.translate(0, 10)
 
     def process_collision(self, rect, marked_collisions):
         if self.check_collision(rect):
 
+            # if abs(self.transform.rect.left - rect.transform.rect.right) <= 10:
+            #     marked_collisions[0] = True
+            #
+            # if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 10:
+            #     marked_collisions[1] = True
+            #
+            # if abs(self.transform.rect.right - rect.transform.rect.left) <= 10:
+            #     marked_collisions[2] = True
+            #
+            # if abs(self.transform.rect.bottom - rect.transform.rect.top) <= 10:
+            #     marked_collisions[3] = True
+
             if abs(self.transform.rect.left - rect.transform.rect.right) <= 10:
+                self.transform.translate(-1 * (self.transform.rect.left - rect.transform.rect.right), 0)
                 marked_collisions[0] = True
 
-            if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 10:
-                marked_collisions[1] = True
+            if abs(self.transform.rect.top - rect.transform.rect.bottom) <= 50:
+                self.transform.translate(0, -1 * (self.transform.rect.top - rect.transform.rect.bottom))
+                marked_collisions[0] = True
 
             if abs(self.transform.rect.right - rect.transform.rect.left) <= 10:
-                marked_collisions[2] = True
+                self.transform.translate(-1 * (self.transform.rect.right - rect.transform.rect.left), 0)
+                marked_collisions[0] = True
 
             if abs(self.transform.rect.bottom - rect.transform.rect.top) <= 10:
-                marked_collisions[3] = True
-
+                self.transform.translate(0, -1 * (self.transform.rect.bottom - rect.transform.rect.top))
+                marked_collisions[0] = True
         return marked_collisions
 
 
@@ -400,6 +415,7 @@ class Player(Movable):
         self.host = None
         self.sound = AudioPlayer(audio_path='audio/take_control.wav')
         self.ground_y = None
+        self.jumping = False
         self.is_alive = True
         super(Player, self).__init__(movable_obj_name=player_obj_name, movable_obj_parent=player_obj_parent,
                                      movable_obj_tag=player_obj_tag, movable_obj_transform=player_obj_transform,
@@ -408,22 +424,19 @@ class Player(Movable):
                                      movable_obj_acceleration=player_obj_acceleration)
 
     def move(self, keys):
-        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and self.collisions[3] and not self.collisions[1]:
-            self.on_ground = False
-            self.transform.velocity_y = -20
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w]) and not self.jumping:
+            self.jumping = True
+            self.transform.velocity_y = -30
             self.set_animation('jump')
         super().move(keys)
-        if not self.on_ground:
+        if self.jumping:
             self.jump()
 
     def jump(self):
-        if self.transform.velocity_y >= 21:
+        if self.transform.velocity_y >= 0:
             self.transform.velocity_y = 0
-            self.on_ground = True
             self.set_animation('idle')
             return
-        if self.collisions[1]:
-            self.transform.velocity_y = 0
 
         self.transform.translate(0, self.transform.velocity_y)
         self.transform.velocity_y += self.transform.acceleration
@@ -431,6 +444,8 @@ class Player(Movable):
     def logic(self, keys):
         if self.host is None:
             self.move(keys)
+            if not self.jumping and self.current_animation_name == 'jump':
+                self.set_animation('idle')
 
     def take_control(self):
         if self.host is None:
@@ -523,6 +538,8 @@ class Room:
         a = [False, False, False, False]
         for collider in self.colliders:
             if player.host is None:
+                if player.jumping and player.check_collision(collider) and abs(player.transform.rect.bottom - collider.transform.rect.top) <= 10:
+                    player.jumping = False
                 a = player.process_collision(collider, a)
                 player.collisions = a
             else:

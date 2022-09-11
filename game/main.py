@@ -46,7 +46,7 @@ scientist_anim_die = ['sprites/Scientist/Die/1.png',
 # объект игрока
 multiplier = 5
 player = Base.Player('player', None, 'player',
-                     Base.Transform(Base.Vector2(200, 170), Base.Vector2(20 * multiplier, 17 * multiplier)),
+                     Base.Transform(Base.Vector2(600, 600), Base.Vector2(20 * multiplier, 17 * multiplier)),
                      ['sprites/Slime/Idle/idle_0.png', 'sprites/Slime/Idle/idle_1.png', 'sprites/Slime/Idle/idle_2.png',
                       'sprites/Slime/Idle/idle_3.png', 'sprites/Slime/Idle/idle_4.png'])
 player_jump_animation = []
@@ -222,7 +222,6 @@ while game:
             a = pygame.mouse.get_pos()[0] - a
             b = pygame.mouse.get_pos()[1] - b
             print(f'({a}, {b})')
-
     keys = pygame.key.get_pressed()  # клавиши, которые были нажаты
 
     # реакции на нажатия клавиш

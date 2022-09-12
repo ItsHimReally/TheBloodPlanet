@@ -3,7 +3,7 @@
 A PyWeek 34 (September 2022) Entry by True Expanded Legendary Great Madmen.
 
 ## Running
-* Run the file `game/run_game.py` to start the game.
+* Run the file game/run_game.py with pycharm or something else to compile the program and start the game.
 
 ### Requires
 * pygame
